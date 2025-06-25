@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../dummy_data/dummy_objects.dart';
 
 void main() {
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MaterialApp(
       home: Scaffold(
         body: body,
@@ -24,7 +24,7 @@ void main() {
 
   group('Season Card', () {
     testWidgets('Page should display button', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(SeasonCard(
+      await tester.pumpWidget(makeTestableWidget(SeasonCard(
         tvSeries: testTvSeriesDetail,
         season: testTvSeriesDetail.seasons!.first,
       )));
@@ -37,7 +37,7 @@ void main() {
     });
 
     testWidgets('Page should display image', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(SeasonCard(
+      await tester.pumpWidget(makeTestableWidget(SeasonCard(
         tvSeries: testTvSeriesDetail,
         season: testTvSeriesDetail.seasons!.first,
       )));
@@ -53,7 +53,7 @@ void main() {
     });
 
     testWidgets('Page should display content', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(SeasonCard(
+      await tester.pumpWidget(makeTestableWidget(SeasonCard(
         tvSeries: testTvSeriesDetail,
         season: testTvSeriesDetail.seasons!.first,
       )));
@@ -64,13 +64,13 @@ void main() {
       expect(textNameFinder, findsOneWidget);
 
       Text textName = tester.widget(textNameFinder);
-      expect(textName.style, kHeading6);
+      expect(textName.style, titleMedium);
 
       final textAirDateFinder = textFinder.at(1);
       expect(textAirDateFinder, findsOneWidget);
 
       Text textAirDate = tester.widget(textAirDateFinder);
-      expect(textAirDate.style, kBodyText);
+      expect(textAirDate.style, bodyMedium);
 
       final dividerFinder = find.byType(VerticalDivider);
       expect(dividerFinder, findsNothing);
@@ -88,7 +88,7 @@ void main() {
         episodeCount: season.episodeCount,
         seasonNumber: season.seasonNumber,
       );
-      await tester.pumpWidget(_makeTestableWidget(SeasonCard(
+      await tester.pumpWidget(makeTestableWidget(SeasonCard(
         tvSeries: testTvSeriesDetail,
         season: newSeason,
       )));
@@ -98,7 +98,7 @@ void main() {
     });
 
     testWidgets('Button should open detail page', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(SeasonCard(
+      await tester.pumpWidget(makeTestableWidget(SeasonCard(
         tvSeries: testTvSeriesDetail,
         season: testTvSeriesDetail.seasons!.first,
       )));

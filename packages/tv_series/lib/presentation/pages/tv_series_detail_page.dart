@@ -144,7 +144,7 @@ class _DetailContentState extends State<DetailContent> {
                               children: [
                                 Text(
                                   widget.tvSeries.name ?? '',
-                                  style: kHeading5,
+                                  style: titleLarge,
                                 ),
                                 _watchlistView(),
                                 Text(
@@ -178,7 +178,7 @@ class _DetailContentState extends State<DetailContent> {
                                 const SizedBox(height: 16),
                                 Text(
                                   'Overview',
-                                  style: kHeading6,
+                                  style: titleMedium,
                                 ),
                                 Text(
                                   widget.tvSeries.overview ?? '',
@@ -229,11 +229,11 @@ class _DetailContentState extends State<DetailContent> {
     return BlocBuilder<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
         builder: (context, state) {
       if (state is TvSeriesWatchlistEmpty) {
-        return ElevatedButton(
+        return const ElevatedButton(
           onPressed: null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.add),
               Text('Watchlist'),
             ],
@@ -288,7 +288,7 @@ class _DetailContentState extends State<DetailContent> {
                   isAllSeasonShowing || seasonsLength == 1
                       ? 'All Season'
                       : 'Last Season',
-                  style: kHeading6,
+                  style: titleMedium,
                 ),
               if (seasonsLength > 1)
                 InkWell(
@@ -351,7 +351,7 @@ class _DetailContentState extends State<DetailContent> {
         children: [
           Text(
             'Recommendations',
-            style: kHeading6,
+            style: titleMedium,
           ),
           BlocBuilder<TvSeriesRecommendationBloc, TvSeriesRecommendationState>(
             builder: (context, state) {

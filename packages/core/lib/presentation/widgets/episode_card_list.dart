@@ -55,13 +55,13 @@ class _EpisodeCardState extends State<EpisodeCard> {
               isExpanded
                   ? Text(
                       '${widget.episode.episodeNumber}. ${widget.episode.name}',
-                      style: kHeading6,
+                      style: titleMedium,
                     )
                   : Text(
                       '${widget.episode.episodeNumber}. ${widget.episode.name}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: kHeading6,
+                      style: titleMedium,
                     ),
               const SizedBox(height: 8),
               if (!isExpanded)
@@ -69,7 +69,7 @@ class _EpisodeCardState extends State<EpisodeCard> {
                   widget.episode.overview ?? '-',
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: kBodyText,
+                  style: bodyMedium,
                 ),
             ],
           ),
@@ -85,12 +85,12 @@ class _EpisodeCardState extends State<EpisodeCard> {
         const SizedBox(height: 8),
         Text(
           'Overview',
-          style: kHeading6,
+          style: titleMedium,
         ),
         const SizedBox(height: 8),
         Text(
           widget.episode.overview ?? '-',
-          style: kBodyText,
+          style: bodyMedium,
         ),
         const SizedBox(height: 8),
         if (widget.episode.guestStars.isNotEmpty)
@@ -99,7 +99,7 @@ class _EpisodeCardState extends State<EpisodeCard> {
             children: [
               Text(
                 'Guest Stars',
-                style: kHeading6,
+                style: titleMedium,
               ),
               const SizedBox(height: 8),
               SizedBox(
@@ -173,7 +173,7 @@ class _EpisodeCardState extends State<EpisodeCard> {
             Icon(isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
             Text(
               isExpanded ? 'Close' : 'Expand',
-              style: kSubtitle,
+              style: titleSmall,
               textAlign: TextAlign.center,
             ),
           ],

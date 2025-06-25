@@ -38,7 +38,7 @@ class SearchPage extends StatelessWidget {
             const SizedBox(height: 16),
             Text(
               'Search Result',
-              style: kHeading6,
+              style: titleMedium,
             ),
             isMovies ? listMovies() : listTvSeries(),
           ],
@@ -62,7 +62,7 @@ class SearchPage extends StatelessWidget {
               child: Center(
                 child: Text(
                   'No data',
-                  style: kHeading6,
+                  style: titleMedium,
                 ),
               ),
             );
@@ -109,7 +109,7 @@ class SearchPage extends StatelessWidget {
               child: Center(
                 child: Text(
                   'No data',
-                  style: kHeading6,
+                  style: titleMedium,
                 ),
               ),
             );

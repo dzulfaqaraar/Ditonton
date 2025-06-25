@@ -50,7 +50,7 @@ class _WatchlistPageState extends State<WatchlistPage> with RouteAware {
                 return Center(
                   child: Text(
                     'No data',
-                    style: kHeading6,
+                    style: titleMedium,
                   ),
                 );
               } else {

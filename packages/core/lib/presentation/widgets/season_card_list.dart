@@ -49,7 +49,7 @@ class SeasonCard extends StatelessWidget {
                             season.name ?? '-',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: kHeading6,
+                            style: titleMedium,
                           ),
                           Row(
                             children: [
@@ -57,7 +57,7 @@ class SeasonCard extends StatelessWidget {
                                 '${(season.airDate?.length ?? 0) > 3 ? season.airDate?.substring(0, 4) : ''}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: kBodyText,
+                                style: bodyMedium,
                               ),
                               if ((season.airDate?.length ?? 0) > 3)
                                 const SizedBox(
@@ -77,7 +77,7 @@ class SeasonCard extends StatelessWidget {
                                   '${season.episodeCount} Episodes',
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  style: kBodyText,
+                                  style: bodyMedium,
                                 ),
                               ),
                             ],

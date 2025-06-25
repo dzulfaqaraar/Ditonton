@@ -32,7 +32,7 @@ class _MoviePageState extends State<MoviePage> {
           children: [
             Text(
               'Now Playing',
-              style: kHeading6,
+              style: titleMedium,
             ),
             BlocBuilder<MovieListBloc, MovieListState>(
                 builder: (context, state) {

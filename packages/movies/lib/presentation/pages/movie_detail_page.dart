@@ -129,7 +129,7 @@ class DetailContent extends StatelessWidget {
                           children: [
                             Text(
                               movie.title,
-                              style: kHeading5,
+                              style: titleLarge,
                             ),
                             _watchlistView(),
                             Text(
@@ -155,7 +155,7 @@ class DetailContent extends StatelessWidget {
                             const SizedBox(height: 16),
                             Text(
                               'Overview',
-                              style: kHeading6,
+                              style: titleMedium,
                             ),
                             Text(
                               movie.overview,
@@ -163,7 +163,7 @@ class DetailContent extends StatelessWidget {
                             const SizedBox(height: 16),
                             Text(
                               'Recommendations',
-                              style: kHeading6,
+                              style: titleMedium,
                             ),
                             _recommendationView(),
                           ],
@@ -206,11 +206,11 @@ class DetailContent extends StatelessWidget {
     return BlocBuilder<MovieWatchlistBloc, MovieWatchlistState>(
         builder: (context, state) {
       if (state is MovieWatchlistEmpty) {
-        return ElevatedButton(
+        return const ElevatedButton(
           onPressed: null,
           child: Row(
             mainAxisSize: MainAxisSize.min,
-            children: const [
+            children: [
               Icon(Icons.add),
               Text('Watchlist'),
             ],

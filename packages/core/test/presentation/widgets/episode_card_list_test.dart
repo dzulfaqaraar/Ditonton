@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../dummy_data/dummy_objects.dart';
 
 void main() {
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MaterialApp(
       home: Scaffold(
         body: body,
@@ -16,7 +16,7 @@ void main() {
 
   group('Episode Card', () {
     testWidgets('Page should display header', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(EpisodeCard(
+      await tester.pumpWidget(makeTestableWidget(EpisodeCard(
         episode: testTvSeriesEpisode.episodes!.first,
       )));
 
@@ -37,16 +37,16 @@ void main() {
       expect(textFinder, findsWidgets);
 
       Text textName = tester.widget(textFinder.at(0));
-      expect(textName.style, kHeading6);
+      expect(textName.style, titleMedium);
 
       Text textOverview = tester.widget(textFinder.at(1));
-      expect(textOverview.style, kBodyText);
+      expect(textOverview.style, bodyMedium);
       expect(textOverview.maxLines, 2);
     });
 
     testWidgets('Page should display content when expanded',
         (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(EpisodeCard(
+      await tester.pumpWidget(makeTestableWidget(EpisodeCard(
         episode: testTvSeriesEpisode.episodes!.first,
       )));
 
@@ -58,20 +58,20 @@ void main() {
       expect(overviewFinder, findsOneWidget);
 
       Text textOverview = tester.widget(overviewFinder);
-      expect(textOverview.style, kHeading6);
+      expect(textOverview.style, titleMedium);
 
       final guestStarsTextFinder = find.text('Guest Stars');
       expect(guestStarsTextFinder, findsOneWidget);
 
       Text textGuestStars = tester.widget(guestStarsTextFinder);
-      expect(textGuestStars.style, kHeading6);
+      expect(textGuestStars.style, titleMedium);
 
       final guestStarsListFinder = find.byType(ListView);
       expect(guestStarsListFinder, findsOneWidget);
     });
 
     testWidgets('Page should display button', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(EpisodeCard(
+      await tester.pumpWidget(makeTestableWidget(EpisodeCard(
         episode: testTvSeriesEpisode.episodes!.first,
       )));
 

@@ -17,7 +17,7 @@ void main() {
     mockWatchlistBloc = MockWatchlistBloc();
   });
 
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<WatchlistBloc>(
@@ -36,7 +36,7 @@ void main() {
     when(mockWatchlistBloc.stream)
         .thenAnswer((_) => Stream.value(WatchlistLoading()));
 
-    await tester.pumpWidget(_makeTestableWidget(const WatchlistPage()));
+    await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
     final progressBarFinder = find.byType(CircularProgressIndicator);
     final centerFinder = find.byType(Center);
@@ -52,7 +52,7 @@ void main() {
     when(mockWatchlistBloc.stream)
         .thenAnswer((_) => Stream.value(WatchlistHasData(testListOfWatchlist)));
 
-    await tester.pumpWidget(_makeTestableWidget(const WatchlistPage()));
+    await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
     final listViewFinder = find.byType(ListView);
     expect(listViewFinder, findsOneWidget);
@@ -72,7 +72,7 @@ void main() {
     when(mockWatchlistBloc.stream)
         .thenAnswer((_) => Stream.value(const WatchlistHasData([])));
 
-    await tester.pumpWidget(_makeTestableWidget(const WatchlistPage()));
+    await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
     final centerFinder = find.byType(Center);
     expect(centerFinder, findsOneWidget);
@@ -83,7 +83,7 @@ void main() {
 
     Text text = tester.widget(textFinder);
     expect(text.data, 'No data');
-    expect(text.style, kHeading6);
+    expect(text.style, titleMedium);
   });
 
   testWidgets('Page should display text with message when Error',
@@ -93,7 +93,7 @@ void main() {
     when(mockWatchlistBloc.stream)
         .thenAnswer((_) => Stream.value(const WatchlistError('Error message')));
 
-    await tester.pumpWidget(_makeTestableWidget(const WatchlistPage()));
+    await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
     final textFinder = find.byKey(const Key('error_message'));
     expect(textFinder, findsOneWidget);
