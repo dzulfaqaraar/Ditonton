@@ -54,3 +54,6 @@ app.*.map.json
 # Claude related files
 .claude/
 CLAUDE.md
+
+# Screenshots Test
+screenshots/
