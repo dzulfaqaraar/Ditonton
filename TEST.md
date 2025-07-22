@@ -451,3 +451,190 @@ await tester.pumpAndSettle(); // Wait for API call and UI update
 5. **Form Submission**: `enterText()` → `tap()` → `pumpAndSettle()`
 
 Understanding when to use each method is crucial for writing reliable widget and integration tests that accurately reflect real user interactions.
+
+## Screenshot Testing Documentation
+
+The Ditonton project includes comprehensive **automated screenshot testing** to capture visual states of all app pages. This provides visual regression testing and documentation of the UI across different screens.
+
+### Screenshot Test Overview
+
+**File Location**: `integration_test/screenshot_test.dart`  
+**Driver File**: `integration_test/screenshot_driver.dart`  
+**Output Directory**: `screenshots/`
+
+### Test Architecture
+
+The screenshot test system uses the **Integration Test framework** with a custom driver for automatic screenshot capture and storage:
+
+```dart
+// Custom screenshot function with Android platform support
+Future<void> takeScreenshot(String screenshotName) async {
+  if (Platform.isAndroid) {
+    await binding.convertFlutterSurfaceToImage();
+  }
+  await binding.takeScreenshot(screenshotName);
+}
+```
+
+### Test Coverage
+
+The screenshot tests capture **14 different app screens** with comprehensive user flow coverage:
+
+#### **Movies Section (5 Screenshots)**
+1. **`movies_page`** - Main movies page with lists
+2. **`movies_detail`** - Movie detail page after tapping first card
+3. **`movies_popular`** - Popular movies list (via "See More")
+4. **`movies_top_rated`** - Top rated movies list (via second "See More")
+5. **`movies_search_page`** - Movie search results for "Harry"
+
+#### **TV Series Section (7 Screenshots)**
+6. **`tv_series_page`** - Main TV series page
+7. **`tv_series_detail`** - TV series detail page
+8. **`tv_series_airing_today`** - Airing today TV series list
+9. **`tv_series_popular`** - Popular TV series list
+10. **`tv_series_top_rated`** - Top rated TV series list
+11. **`tv_series_search_page`** - TV series search results for "One Piece"
+12. **`tv_series_episode`** - TV series episode page with season navigation
+
+#### **App Features (2 Screenshots)**
+13. **`watchlist_page`** - Watchlist page with added items
+14. **`about_page`** - About page
+
+### Complex Navigation Flows
+
+Several tests demonstrate sophisticated user interaction patterns:
+
+#### **Advanced Search Flow (TV Series Episode Test)**
+```dart
+// Navigate to TV series search
+await tester.tap(find.byKey(Key('drawer_icon')));
+await tester.tap(find.byKey(Key('menu_tv_series')));
+await tester.tap(find.byIcon(Icons.search));
+
+// Search for "One Piece" and wait for results
+await tester.enterText(searchField, 'One Piece');
+await tester.pump(const Duration(seconds: 2));
+
+// Navigate to series detail and episodes
+await tester.tap(find.byKey(Key('tv_series_card_item')).first);
+await tester.tap(find.byKey(Key('season_button_toggle')));
+
+// Scroll to reveal season cards and click first season
+await tester.drag(customScrollView, const Offset(0, -600));
+await tester.tap(find.byKey(Key('season_card_item')).first);
+```
+
+#### **Watchlist Integration Flow**
+```dart
+// Add movie to watchlist
+final movieCard = find.byKey(Key('card_item_key')).first;
+await tester.tap(movieCard);
+await tester.tap(find.byKey(Key('watchlist_text')));
+await tester.tap(find.byIcon(Icons.arrow_back));
+
+// Add TV series to watchlist  
+await tester.tap(find.byKey(Key('drawer_icon')));
+await tester.tap(find.byKey(Key('menu_tv_series')));
+final tvSeriesCard = find.byKey(Key('card_item_key')).first;
+await tester.tap(tvSeriesCard);
+await tester.tap(find.byKey(Key('watchlist_text')));
+
+// Navigate to watchlist page to see added items
+await tester.tap(find.byKey(Key('menu_watchlist')));
+```
+
+### Key Testing Techniques
+
+#### **Drawer Navigation Pattern**
+Most tests use consistent navigation through the app drawer:
+```dart
+await tester.tap(find.byKey(Key('drawer_icon')));
+await tester.pumpAndSettle();
+await tester.tap(find.byKey(Key('menu_tv_series')));
+await tester.pumpAndSettle();
+```
+
+#### **Smart Button Selection**
+Tests handle multiple "See More" buttons intelligently:
+```dart
+final seeMoreButtons = find.text('See More');
+if (seeMoreButtons.evaluate().length >= 2) {
+  await tester.tap(seeMoreButtons.at(1)); // Second button
+}
+```
+
+#### **Search with Timing**
+Search tests wait for API responses:
+```dart
+await tester.enterText(searchField, 'One Piece');
+await tester.pumpAndSettle();
+await tester.pump(const Duration(seconds: 2)); // Wait for results
+```
+
+#### **Advanced Scrolling**
+Complex scrolling for nested content:
+```dart
+// Scroll within CustomScrollView to reveal season cards
+final customScrollView = find.byType(CustomScrollView);
+if (customScrollView.evaluate().isNotEmpty) {
+  await tester.drag(customScrollView, const Offset(0, -600));
+  await tester.pump();
+}
+```
+
+### Screenshot Driver Implementation
+
+The custom screenshot driver automatically saves images as PNG files:
+
+```dart
+return integrationDriver(
+  onScreenshot: (String screenshotName, List<int> screenshotBytes, [args]) async {
+    final Directory screenshotsDir = Directory('screenshots');
+    
+    if (!await screenshotsDir.exists()) {
+      await screenshotsDir.create(recursive: true);
+    }
+    
+    final File screenshot = File('screenshots/$screenshotName.png');
+    await screenshot.writeAsBytes(screenshotBytes);
+    
+    return true;
+  },
+);
+```
+
+### Running Screenshot Tests
+
+**Command:**
+```bash
+# Method 1: Direct execution (requires executable permission)
+chmod +x test_screenshot.sh        # Make executable (run once)  
+./test_screenshot.sh              # Execute directly (bash, zsh, fish)
+
+# Method 2: Shell interpreter (works without executable permission)
+sh test_screenshot.sh             # Works in all POSIX shells (bash, zsh, dash)
+bash test_screenshot.sh           # Explicitly use bash interpreter
+```
+
+**Output:**
+- All screenshots saved to `screenshots/` directory as PNG files
+- Sequential numbering provides clear navigation flow documentation
+- Named screenshots clearly indicate the captured screen state
+
+### Benefits of Screenshot Testing
+
+1. **Visual Regression Detection**: Automatically detect UI changes
+2. **Documentation**: Visual reference of all app screens
+3. **Quality Assurance**: Verify UI consistency across updates
+4. **Design Review**: Easy visual comparison of app states
+5. **Onboarding**: New developers can see complete app flow
+
+### Screenshot Test Best Practices
+
+- **Consistent Naming**: Sequential numbers with descriptive names
+- **Complete Flows**: Tests cover entire user journeys, not just individual screens
+- **Error Handling**: Tests include conditional logic for optional UI elements
+- **Platform Support**: Android-specific screenshot handling implemented
+- **Timing Awareness**: Proper delays for search results and animations
+
+The screenshot testing system provides comprehensive visual coverage of the Ditonton app, ensuring UI consistency and serving as living documentation of the complete user experience.

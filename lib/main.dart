@@ -67,6 +67,7 @@ class MyApp extends StatelessWidget {
         ),
         home: HomePage(),
         navigatorObservers: [routeObserver],
+        debugShowCheckedModeBanner: false,
         onGenerateRoute: (RouteSettings settings) {
           switch (settings.name) {
             case '/home':

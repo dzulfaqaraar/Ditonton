@@ -205,7 +205,7 @@ class DetailContent extends StatelessWidget {
                 isAddedWatchlist == true
                     ? const Icon(Icons.check)
                     : const Icon(Icons.add),
-                const Text('Watchlist'),
+                const Text('Watchlist', key: Key('watchlist_text')),
               ],
             ),
           );

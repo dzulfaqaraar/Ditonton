@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -16,12 +17,19 @@ void main() {
     GetIt.I.reset();
   });
 
+  Future<void> takeScreenshot(String screenshotName) async {
+    if (Platform.isAndroid) {
+      await binding.convertFlutterSurfaceToImage();
+    }
+    await binding.takeScreenshot(screenshotName);
+  }
+
   group('Screenshot Tests', () {
-    testWidgets('Home page screenshot', (WidgetTester tester) async {
+    testWidgets('Movies page screenshot', (WidgetTester tester) async {
       app.main();
       await tester.pumpAndSettle();
 
-      await binding.takeScreenshot('home_page');
+      await takeScreenshot('1.movies_page');
     });
 
     testWidgets('Movie detail screenshot', (WidgetTester tester) async {
@@ -32,10 +40,52 @@ void main() {
       await tester.tap(movieCard);
       await tester.pumpAndSettle();
 
-      await binding.takeScreenshot('movie_detail');
+      await takeScreenshot('2.movies_detail');
     });
 
-    testWidgets('TV series page screenshot', (WidgetTester tester) async {
+    testWidgets('Movies popular screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      final seeMoreButton = find.text('See More').first;
+      await tester.tap(seeMoreButton);
+      await tester.pumpAndSettle();
+
+      await takeScreenshot('3.movies_popular');
+    });
+
+    testWidgets('Movies top rated screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      final seeMoreButtons = find.text('See More');
+      if (seeMoreButtons.evaluate().length >= 2) {
+        await tester.tap(seeMoreButtons.at(1));
+        await tester.pumpAndSettle();
+      }
+
+      await takeScreenshot('4.movies_top_rated');
+    });
+
+    testWidgets('Movies search screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      final searchIcon = find.byIcon(Icons.search);
+      await tester.tap(searchIcon);
+      await tester.pumpAndSettle();
+
+      final searchField = find.byType(TextField);
+      if (searchField.evaluate().isNotEmpty) {
+        await tester.enterText(searchField, 'Harry');
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 2));
+      }
+
+      await takeScreenshot('5.movies_search_page');
+    });
+
+    testWidgets('TV Series page screenshot', (WidgetTester tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -45,10 +95,10 @@ void main() {
       await tester.tap(find.byKey(Key('menu_tv_series')));
       await tester.pumpAndSettle();
 
-      await binding.takeScreenshot('tv_series_page');
+      await takeScreenshot('6.tv_series_page');
     });
 
-    testWidgets('TV series detail screenshot', (WidgetTester tester) async {
+    testWidgets('TV Series detail screenshot', (WidgetTester tester) async {
       app.main();
       await tester.pumpAndSettle();
 
@@ -62,24 +112,188 @@ void main() {
       await tester.tap(tvSeriesCard);
       await tester.pumpAndSettle();
 
-      await binding.takeScreenshot('tv_series_detail');
+      await takeScreenshot('7.tv_series_detail');
+    });
+
+    testWidgets('TV Series airing today screenshot', (
+      WidgetTester tester,
+    ) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('menu_tv_series')));
+      await tester.pumpAndSettle();
+
+      final seeMoreButtons = find.text('See More');
+      if (seeMoreButtons.evaluate().isNotEmpty) {
+        await tester.tap(seeMoreButtons.first);
+        await tester.pumpAndSettle();
+      }
+
+      await takeScreenshot('8.tv_series_airing_today');
+    });
+
+    testWidgets('TV Series popular screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('menu_tv_series')));
+      await tester.pumpAndSettle();
+
+      final seeMoreButtons = find.text('See More');
+      if (seeMoreButtons.evaluate().length >= 2) {
+        await tester.tap(seeMoreButtons.at(1));
+        await tester.pumpAndSettle();
+      }
+
+      await takeScreenshot('9.tv_series_popular');
+    });
+
+    testWidgets('TV Series top rated screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('menu_tv_series')));
+      await tester.pumpAndSettle();
+
+      final seeMoreButtons = find.text('See More');
+      if (seeMoreButtons.evaluate().length >= 3) {
+        await tester.tap(seeMoreButtons.at(2));
+        await tester.pumpAndSettle();
+      }
+
+      await takeScreenshot('10.tv_series_top_rated');
+    });
+
+    testWidgets('TV Series search screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('menu_tv_series')));
+      await tester.pumpAndSettle();
+
+      final searchIcon = find.byIcon(Icons.search);
+      await tester.tap(searchIcon);
+      await tester.pumpAndSettle();
+
+      final searchField = find.byType(TextField);
+      if (searchField.evaluate().isNotEmpty) {
+        await tester.enterText(searchField, 'One Piece');
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 2));
+      }
+
+      await takeScreenshot('11.tv_series_search_page');
+    });
+
+    testWidgets('TV Series episode screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('menu_tv_series')));
+      await tester.pumpAndSettle();
+
+      final searchIcon = find.byIcon(Icons.search);
+      await tester.tap(searchIcon);
+      await tester.pumpAndSettle();
+
+      final searchField = find.byType(TextField);
+      if (searchField.evaluate().isNotEmpty) {
+        await tester.enterText(searchField, 'One Piece');
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 2));
+      }
+
+      final tvSeriesCard = find.byKey(Key('tv_series_card_item')).first;
+      await tester.tap(tvSeriesCard);
+      await tester.pumpAndSettle();
+
+      final seasonButton = find.byKey(Key('season_button_toggle'));
+      if (seasonButton.evaluate().isNotEmpty) {
+        await tester.tap(seasonButton);
+        await tester.pumpAndSettle();
+      }
+
+      final customScrollView = find.byType(CustomScrollView);
+      if (customScrollView.evaluate().isNotEmpty) {
+        await tester.drag(customScrollView, const Offset(0, -600));
+        await tester.pump();
+      }
+
+      final seasonCard = find.byKey(Key('season_card_item')).first;
+      if (seasonCard.evaluate().isNotEmpty) {
+        await tester.tap(seasonCard);
+        await tester.pumpAndSettle();
+      }
+
+      await takeScreenshot('12.tv_series_episode');
     });
 
     testWidgets('Watchlist page screenshot', (WidgetTester tester) async {
       app.main();
       await tester.pumpAndSettle();
 
-      // Add a movie to watchlist first
+      // Movies Page
+
       final movieCard = find.byKey(Key('card_item_key')).first;
       await tester.tap(movieCard);
       await tester.pumpAndSettle();
 
-      final addToWatchlistButton = find.byType(ElevatedButton);
-      await tester.tap(addToWatchlistButton);
+      final movieWatchlistButton = find.byKey(Key('watchlist_text'));
+      if (movieWatchlistButton.evaluate().isNotEmpty) {
+        await tester.tap(movieWatchlistButton);
+        await tester.pumpAndSettle();
+      }
+
+      final movieBackButton = find.byIcon(Icons.arrow_back);
+      if (movieBackButton.evaluate().isNotEmpty) {
+        await tester.tap(movieBackButton);
+        await tester.pumpAndSettle();
+      }
+
+      // TV Series Page
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byType(IconButton));
+      await tester.tap(find.byKey(Key('menu_tv_series')));
       await tester.pumpAndSettle();
+
+      final tvSeriesCard = find.byKey(Key('card_item_key')).first;
+      await tester.tap(tvSeriesCard);
+      await tester.pumpAndSettle();
+
+      final tvSeriesWatchlistButton = find.byKey(Key('watchlist_text'));
+      if (tvSeriesWatchlistButton.evaluate().isNotEmpty) {
+        await tester.tap(tvSeriesWatchlistButton);
+        await tester.pumpAndSettle();
+      }
+
+      final tvSeriesBackButton = find.byIcon(Icons.arrow_back);
+      if (tvSeriesBackButton.evaluate().isNotEmpty) {
+        await tester.tap(tvSeriesBackButton);
+        await tester.pumpAndSettle();
+      }
+
+      // Wait for snackbar animations
+      await tester.pump(const Duration(seconds: 3));
+
+      // Watchlist Page
 
       await tester.tap(find.byKey(Key('drawer_icon')));
       await tester.pumpAndSettle();
@@ -87,24 +301,7 @@ void main() {
       await tester.tap(find.byKey(Key('menu_watchlist')));
       await tester.pumpAndSettle();
 
-      await binding.takeScreenshot('watchlist_page');
-    });
-
-    testWidgets('Search page screenshot', (WidgetTester tester) async {
-      app.main();
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(Key('drawer_icon')));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.byKey(Key('menu_search')));
-      await tester.pumpAndSettle();
-
-      final searchField = find.byType(TextField);
-      await tester.enterText(searchField, 'Spider-Man');
-      await tester.pumpAndSettle();
-
-      await binding.takeScreenshot('search_page');
+      await takeScreenshot('13.watchlist_page');
     });
 
     testWidgets('About page screenshot', (WidgetTester tester) async {
@@ -114,21 +311,11 @@ void main() {
       await tester.tap(find.byKey(Key('drawer_icon')));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.byKey(Key('menu_about')));
+      final aboutTile = find.byIcon(Icons.info_outline);
+      await tester.tap(aboutTile);
       await tester.pumpAndSettle();
 
-      await binding.takeScreenshot('about_page');
-    });
-
-    testWidgets('Popular movies screenshot', (WidgetTester tester) async {
-      app.main();
-      await tester.pumpAndSettle();
-
-      final seeMoreButton = find.text('See More').first;
-      await tester.tap(seeMoreButton);
-      await tester.pumpAndSettle();
-
-      await binding.takeScreenshot('popular_movies');
+      await takeScreenshot('14.about_page');
     });
   });
 }
