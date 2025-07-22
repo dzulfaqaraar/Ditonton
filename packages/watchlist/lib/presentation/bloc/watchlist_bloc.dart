@@ -1,25 +1,23 @@
-import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:watchlist/watchlist.dart';
 
 part 'watchlist_event.dart';
-part 'watchlist_state.dart';
 
-class WatchlistBloc extends Bloc<WatchlistEvent, WatchlistState> {
+class WatchlistBloc extends Bloc<WatchlistEvent, BlocState> {
   final GetWatchlistData _getWatchlistData;
 
-  WatchlistBloc(this._getWatchlistData) : super(WatchlistEmpty()) {
+  WatchlistBloc(this._getWatchlistData) : super(BlocEmpty()) {
     on<OnFetchingData>((event, emit) async {
-      emit(WatchlistLoading());
+      emit(BlocLoading());
 
       final result = await _getWatchlistData.execute();
       result.fold(
         (failure) {
-          emit(WatchlistError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(WatchlistHasData(data));
+          emit(BlocHasData(data));
         },
       );
     });

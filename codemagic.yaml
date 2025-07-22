@@ -1,0 +1,187 @@
+workflows:
+  flutter-test:
+    name: Flutter Test & Analysis
+    max_build_duration: 30
+    instance_type: linux_x2
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: develop
+          include: true
+    environment:
+      groups:
+        - ditonton_env # Define environment group in Codemagic UI
+      flutter: 3.32.7
+      java: 17
+    scripts:
+      - name: Create environment files
+        script: |
+          echo "Creating .env file..."
+          cat > .env << EOF
+          BASE_URL=https://api.themoviedb.org/3
+          API_KEY=$API_KEY
+          EOF
+          
+          echo "Creating certificates.pem..."
+          mkdir -p ./certificates
+          echo "$CERT_PEM" > ./certificates/certificates.pem
+      
+      - name: Get dependencies
+        script: |
+          echo "Getting Flutter dependencies..."
+          flutter pub get
+          
+          echo "Getting dependencies for all packages..."
+          cd packages/core && flutter pub get && flutter pub run build_runner build
+          cd ../movies && flutter pub get && flutter pub run build_runner build
+          cd ../tv_series && flutter pub get && flutter pub run build_runner build
+          cd ../search && flutter pub get && flutter pub run build_runner build
+          cd ../watchlist && flutter pub get && flutter pub run build_runner build
+          cd ../about && flutter pub get
+          cd ../..
+      
+      - name: Run static analysis
+        script: |
+          echo "Running Flutter analyze..."
+          flutter analyze
+      
+      - name: Format check
+        script: |
+          echo "Checking Dart format..."
+          dart format --set-exit-if-changed .
+      
+      - name: Run unit tests with coverage
+        script: |
+          echo "Running unit tests..."
+          chmod +x ./test.sh
+          ./test.sh
+      
+      - name: Upload coverage to Codecov
+        script: |
+          if [ -f "coverage/lcov.info" ]; then
+            echo "Uploading coverage to Codecov..."
+            curl -Os https://uploader.codecov.io/latest/linux/codecov
+            chmod +x codecov
+            ./codecov -t $CODECOV_TOKEN -f coverage/lcov.info
+          else
+            echo "No coverage file found"
+          fi
+    artifacts:
+      - coverage/**
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com # Replace with your email
+        notify:
+          success: false
+          failure: true
+
+  android-build:
+    name: Android Build
+    max_build_duration: 60
+    instance_type: linux_x2
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: develop
+          include: true
+    environment:
+      groups:
+        - ditonton_env
+      flutter: 3.32.7
+      java: 17
+      vars:
+        FLUTTER_COMPILE_SDK: 34
+        FLUTTER_MIN_SDK: 21
+        FLUTTER_TARGET_SDK: 34
+        FLUTTER_NDK_VERSION: 27.0.12077973
+    scripts:
+      - name: Set up Android configuration
+        script: |
+          echo "Setting up Android local.properties..."
+          cat > android/local.properties << EOF
+          flutter.compileSdk=$FLUTTER_COMPILE_SDK
+          flutter.minSdk=$FLUTTER_MIN_SDK
+          flutter.targetSdk=$FLUTTER_TARGET_SDK
+          flutter.ndkVersion=$FLUTTER_NDK_VERSION
+          EOF
+      
+      - name: Create environment files
+        script: |
+          echo "Creating .env file..."
+          cat > .env << EOF
+          BASE_URL=https://api.themoviedb.org/3
+          API_KEY=$API_KEY
+          EOF
+          
+          echo "Creating certificates.pem..."
+          mkdir -p ./certificates
+          echo "$CERT_PEM" > ./certificates/certificates.pem
+      
+      - name: Build Android APK
+        script: |
+          echo "Building Android APK..."
+          flutter build apk --release
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com # Replace with your email
+        notify:
+          success: true
+          failure: true
+
+  ios-build:
+    name: iOS Build
+    max_build_duration: 60
+    instance_type: mac_mini_m1
+    triggering:
+      events:
+        - push
+        - pull_request
+      branch_patterns:
+        - pattern: develop
+          include: true
+    environment:
+      groups:
+        - ditonton_env
+      flutter: 3.32.7
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Get dependencies
+        script: |
+          echo "Getting Flutter dependencies..."
+          flutter pub get
+      
+      - name: Create environment files
+        script: |
+          echo "Creating .env file..."
+          cat > .env << EOF
+          BASE_URL=https://api.themoviedb.org/3
+          API_KEY=$API_KEY
+          EOF
+          
+          echo "Creating certificates.pem..."
+          mkdir -p ./certificates
+          echo "$CERT_PEM" > ./certificates/certificates.pem
+      
+      - name: Build iOS (no codesign)
+        script: |
+          echo "Building iOS app..."
+          flutter build ios --release --no-codesign
+    artifacts:
+      - build/ios/iphoneos/
+    publishing:
+      email:
+        recipients:
+          - your-email@example.com # Replace with your email
+        notify:
+          success: true
+          failure: true

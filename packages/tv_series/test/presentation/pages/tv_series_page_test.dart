@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,43 +35,50 @@ void main() {
     mockTvSeriesWatchlistBloc = MockTvSeriesWatchlistBloc();
   });
 
-  void _arrangeUsecaseAiringTodayLoading() {
-    when(mockAiringTodayTvSeriesBloc.state)
-        .thenReturn(AiringTodayTvSeriesLoading());
-    when(mockAiringTodayTvSeriesBloc.stream)
-        .thenAnswer((_) => Stream.value(AiringTodayTvSeriesLoading()));
+  void arrangeUsecaseAiringTodayLoading() {
+    when(mockAiringTodayTvSeriesBloc.state).thenReturn(BlocLoading());
+    when(
+      mockAiringTodayTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
   }
 
-  void _arrangeUsecasePopularLoading() {
-    when(mockPopularTvSeriesBloc.state).thenReturn(PopularTvSeriesLoading());
-    when(mockPopularTvSeriesBloc.stream)
-        .thenAnswer((_) => Stream.value(PopularTvSeriesLoading()));
+  void arrangeUsecasePopularLoading() {
+    when(mockPopularTvSeriesBloc.state).thenReturn(BlocLoading());
+    when(
+      mockPopularTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
   }
 
-  void _arrangeUsecaseTopRatedLoading() {
-    when(mockTopRatedTvSeriesBloc.state).thenReturn(TopRatedTvSeriesLoading());
-    when(mockTopRatedTvSeriesBloc.stream)
-        .thenAnswer((_) => Stream.value(TopRatedTvSeriesLoading()));
+  void arrangeUsecaseTopRatedLoading() {
+    when(mockTopRatedTvSeriesBloc.state).thenReturn(BlocLoading());
+    when(
+      mockTopRatedTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
   }
 
-  void _arrangeUsecaseDetail() {
-    when(mockTvSeriesWatchlistBloc.state)
-        .thenReturn(const TvSeriesWatchlistHasMessage(false, null));
+  void arrangeUsecaseDetail() {
+    when(
+      mockTvSeriesWatchlistBloc.state,
+    ).thenReturn(const TvSeriesWatchlistHasMessage(false, null));
     when(mockTvSeriesWatchlistBloc.stream).thenAnswer(
-        (_) => Stream.value(const TvSeriesWatchlistHasMessage(false, null)));
+      (_) => Stream.value(const TvSeriesWatchlistHasMessage(false, null)),
+    );
 
-    when(mockTvSeriesDetailBloc.state)
-        .thenReturn(const TvSeriesDetailHasData(testTvSeriesDetail));
+    when(
+      mockTvSeriesDetailBloc.state,
+    ).thenReturn(const BlocHasData<TvSeriesDetail>(testTvSeriesDetail));
     when(mockTvSeriesDetailBloc.stream).thenAnswer(
-        (_) => Stream.value(const TvSeriesDetailHasData(testTvSeriesDetail)));
+      (_) =>
+          Stream.value(const BlocHasData<TvSeriesDetail>(testTvSeriesDetail)),
+    );
 
-    when(mockTvSeriesRecommendationBloc.state)
-        .thenReturn(TvSeriesRecommendationEmpty());
-    when(mockTvSeriesRecommendationBloc.stream)
-        .thenAnswer((_) => Stream.value(TvSeriesRecommendationEmpty()));
+    when(mockTvSeriesRecommendationBloc.state).thenReturn(BlocEmpty());
+    when(
+      mockTvSeriesRecommendationBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocEmpty()));
   }
 
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<PopularTvSeriesBloc>(
@@ -98,13 +106,16 @@ void main() {
           switch (settings.name) {
             case airingTodayTvSeriesRoute:
               return MaterialPageRoute(
-                  builder: (_) => const AiringTodayTvSeriesPage());
+                builder: (_) => const AiringTodayTvSeriesPage(),
+              );
             case popularTvSeriesRoute:
               return MaterialPageRoute(
-                  builder: (_) => const PopularTvSeriesPage());
+                builder: (_) => const PopularTvSeriesPage(),
+              );
             case topRatedTvSeriesRoute:
               return MaterialPageRoute(
-                  builder: (_) => const TopRatedTvSeriesPage());
+                builder: (_) => const TopRatedTvSeriesPage(),
+              );
             case detailTvSeriesRoute:
               final id = settings.arguments as int;
               return MaterialPageRoute(
@@ -118,13 +129,14 @@ void main() {
     );
   }
 
-  testWidgets('Page should display center progress bar when loading',
-      (WidgetTester tester) async {
-    _arrangeUsecaseAiringTodayLoading();
-    _arrangeUsecasePopularLoading();
-    _arrangeUsecaseTopRatedLoading();
+  testWidgets('Page should display center progress bar when loading', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseAiringTodayLoading();
+    arrangeUsecasePopularLoading();
+    arrangeUsecaseTopRatedLoading();
 
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
+    await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
 
     final nowPlayingTitleFinder = find.text('Airing Today');
     expect(nowPlayingTitleFinder, findsOneWidget);
@@ -140,56 +152,70 @@ void main() {
   });
 
   testWidgets(
-      'Airing Today section should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    when(mockAiringTodayTvSeriesBloc.state)
-        .thenReturn(AiringTodayTvSeriesHasData(testTvSeriesList));
-    when(mockAiringTodayTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(AiringTodayTvSeriesHasData(testTvSeriesList)));
+    'Airing Today section should display ListView when data is loaded',
+    (WidgetTester tester) async {
+      when(
+        mockAiringTodayTvSeriesBloc.state,
+      ).thenReturn(BlocHasData(testTvSeriesList));
+      when(
+        mockAiringTodayTvSeriesBloc.stream,
+      ).thenAnswer((_) => Stream.value(BlocHasData(testTvSeriesList)));
 
-    _arrangeUsecasePopularLoading();
-    _arrangeUsecaseTopRatedLoading();
+      arrangeUsecasePopularLoading();
+      arrangeUsecaseTopRatedLoading();
 
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
+      await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
+
+      final subheadingFinder = find.byType(SubHeadingView);
+
+      final subheadingTitleFinder = find.descendant(
+        of: subheadingFinder,
+        matching: find.text('Airing Today'),
+      );
+      expect(subheadingTitleFinder, findsOneWidget);
+
+      final subheadingButtonFinder = find.descendant(
+        of: subheadingFinder,
+        matching: find.byType(InkWell),
+      );
+      expect(subheadingButtonFinder, findsWidgets);
+
+      final listFinder = find.byType(ListView);
+      expect(listFinder, findsOneWidget);
+
+      await tester.tap(subheadingButtonFinder.at(0));
+      await tester.pump();
+    },
+  );
+
+  testWidgets('Popular section should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseAiringTodayLoading();
+
+    when(
+      mockPopularTvSeriesBloc.state,
+    ).thenReturn(BlocHasData(testTvSeriesList));
+    when(
+      mockPopularTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testTvSeriesList)));
+
+    arrangeUsecaseTopRatedLoading();
+
+    await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
 
     final subheadingFinder = find.byType(SubHeadingView);
 
     final subheadingTitleFinder = find.descendant(
-        of: subheadingFinder, matching: find.text('Airing Today'));
+      of: subheadingFinder,
+      matching: find.text('Popular'),
+    );
     expect(subheadingTitleFinder, findsOneWidget);
 
-    final subheadingButtonFinder =
-        find.descendant(of: subheadingFinder, matching: find.byType(InkWell));
-    expect(subheadingButtonFinder, findsWidgets);
-
-    final listFinder = find.byType(ListView);
-    expect(listFinder, findsOneWidget);
-
-    await tester.tap(subheadingButtonFinder.at(0));
-    await tester.pump();
-  });
-
-  testWidgets('Popular section should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    _arrangeUsecaseAiringTodayLoading();
-
-    when(mockPopularTvSeriesBloc.state)
-        .thenReturn(PopularTvSeriesHasData(testTvSeriesList));
-    when(mockPopularTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(PopularTvSeriesHasData(testTvSeriesList)));
-
-    _arrangeUsecaseTopRatedLoading();
-
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
-
-    final subheadingFinder = find.byType(SubHeadingView);
-
-    final subheadingTitleFinder =
-        find.descendant(of: subheadingFinder, matching: find.text('Popular'));
-    expect(subheadingTitleFinder, findsOneWidget);
-
-    final subheadingButtonFinder =
-        find.descendant(of: subheadingFinder, matching: find.byType(InkWell));
+    final subheadingButtonFinder = find.descendant(
+      of: subheadingFinder,
+      matching: find.byType(InkWell),
+    );
     expect(subheadingButtonFinder, findsWidgets);
 
     final listFinder = find.byType(ListView);
@@ -199,26 +225,33 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('Top Rated section should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    _arrangeUsecaseAiringTodayLoading();
-    _arrangeUsecasePopularLoading();
+  testWidgets('Top Rated section should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseAiringTodayLoading();
+    arrangeUsecasePopularLoading();
 
-    when(mockTopRatedTvSeriesBloc.state)
-        .thenReturn(TopRatedTvSeriesHasData(testTvSeriesList));
+    when(
+      mockTopRatedTvSeriesBloc.state,
+    ).thenReturn(BlocHasData<List<TvSeries>>(testTvSeriesList));
     when(mockTopRatedTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(TopRatedTvSeriesHasData(testTvSeriesList)));
+      (_) => Stream.value(BlocHasData<List<TvSeries>>(testTvSeriesList)),
+    );
 
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
+    await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
 
     final subheadingFinder = find.byType(SubHeadingView);
 
-    final subheadingTitleFinder =
-        find.descendant(of: subheadingFinder, matching: find.text('Top Rated'));
+    final subheadingTitleFinder = find.descendant(
+      of: subheadingFinder,
+      matching: find.text('Top Rated'),
+    );
     expect(subheadingTitleFinder, findsOneWidget);
 
-    final subheadingButtonFinder =
-        find.descendant(of: subheadingFinder, matching: find.byType(InkWell));
+    final subheadingButtonFinder = find.descendant(
+      of: subheadingFinder,
+      matching: find.byType(InkWell),
+    );
     expect(subheadingButtonFinder, findsWidgets);
 
     final listFinder = find.byType(ListView);
@@ -228,76 +261,92 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('Airing Today should open TvSeries Detail Page when item clicked',
-      (WidgetTester tester) async {
-    when(mockAiringTodayTvSeriesBloc.state)
-        .thenReturn(AiringTodayTvSeriesHasData(testTvSeriesList));
-    when(mockAiringTodayTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(AiringTodayTvSeriesHasData(testTvSeriesList)));
+  testWidgets(
+    'Airing Today should open TvSeries Detail Page when item clicked',
+    (WidgetTester tester) async {
+      when(
+        mockAiringTodayTvSeriesBloc.state,
+      ).thenReturn(BlocHasData(testTvSeriesList));
+      when(
+        mockAiringTodayTvSeriesBloc.stream,
+      ).thenAnswer((_) => Stream.value(BlocHasData(testTvSeriesList)));
 
-    _arrangeUsecasePopularLoading();
-    _arrangeUsecaseTopRatedLoading();
+      arrangeUsecasePopularLoading();
+      arrangeUsecaseTopRatedLoading();
 
-    _arrangeUsecaseDetail();
+      arrangeUsecaseDetail();
 
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
+      await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
+
+      final listFinder = find.byType(ListView);
+      expect(listFinder, findsOneWidget);
+
+      final buttonFinder = find.descendant(
+        of: listFinder,
+        matching: find.byKey(const Key('card_item_key')),
+      );
+      expect(buttonFinder, findsOneWidget);
+
+      await tester.tap(buttonFinder);
+      await tester.pump();
+    },
+  );
+
+  testWidgets('Popular should open TvSeries Detail Page when item clicked', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseAiringTodayLoading();
+
+    when(
+      mockPopularTvSeriesBloc.state,
+    ).thenReturn(BlocHasData(testTvSeriesList));
+    when(
+      mockPopularTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testTvSeriesList)));
+
+    arrangeUsecaseTopRatedLoading();
+
+    arrangeUsecaseDetail();
+
+    await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
 
     final listFinder = find.byType(ListView);
     expect(listFinder, findsOneWidget);
 
     final buttonFinder = find.descendant(
-        of: listFinder, matching: find.byKey(const Key('card_item_key')));
+      of: listFinder,
+      matching: find.byKey(const Key('card_item_key')),
+    );
     expect(buttonFinder, findsOneWidget);
 
     await tester.tap(buttonFinder);
     await tester.pump();
   });
 
-  testWidgets('Popular should open TvSeries Detail Page when item clicked',
-      (WidgetTester tester) async {
-    _arrangeUsecaseAiringTodayLoading();
+  testWidgets('Top Rated should open TvSeries Detail Page when item clicked', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseAiringTodayLoading();
+    arrangeUsecasePopularLoading();
 
-    when(mockPopularTvSeriesBloc.state)
-        .thenReturn(PopularTvSeriesHasData(testTvSeriesList));
-    when(mockPopularTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(PopularTvSeriesHasData(testTvSeriesList)));
-
-    _arrangeUsecaseTopRatedLoading();
-
-    _arrangeUsecaseDetail();
-
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
-
-    final listFinder = find.byType(ListView);
-    expect(listFinder, findsOneWidget);
-
-    final buttonFinder = find.descendant(
-        of: listFinder, matching: find.byKey(const Key('card_item_key')));
-    expect(buttonFinder, findsOneWidget);
-
-    await tester.tap(buttonFinder);
-    await tester.pump();
-  });
-
-  testWidgets('Top Rated should open TvSeries Detail Page when item clicked',
-      (WidgetTester tester) async {
-    _arrangeUsecaseAiringTodayLoading();
-    _arrangeUsecasePopularLoading();
-
-    when(mockTopRatedTvSeriesBloc.state)
-        .thenReturn(TopRatedTvSeriesHasData(testTvSeriesList));
+    when(
+      mockTopRatedTvSeriesBloc.state,
+    ).thenReturn(BlocHasData<List<TvSeries>>(testTvSeriesList));
     when(mockTopRatedTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(TopRatedTvSeriesHasData(testTvSeriesList)));
+      (_) => Stream.value(BlocHasData<List<TvSeries>>(testTvSeriesList)),
+    );
 
-    _arrangeUsecaseDetail();
+    arrangeUsecaseDetail();
 
-    await tester.pumpWidget(_makeTestableWidget(const TvSeriesPage()));
+    await tester.pumpWidget(makeTestableWidget(const TvSeriesPage()));
 
     final listFinder = find.byType(ListView);
     expect(listFinder, findsOneWidget);
 
     final buttonFinder = find.descendant(
-        of: listFinder, matching: find.byKey(const Key('card_item_key')));
+      of: listFinder,
+      matching: find.byKey(const Key('card_item_key')),
+    );
     expect(buttonFinder, findsOneWidget);
 
     await tester.tap(buttonFinder);

@@ -1,5 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core/domain/usecase/get_tvseries.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -7,53 +9,51 @@ import 'package:mockito/mockito.dart';
 import 'package:tv_series/tv_series.dart';
 
 import '../../../../core/test/dummy_data/dummy_objects.dart';
-import 'popular_tv_series_bloc_test.mocks.dart';
+import 'airing_today_tv_series_bloc_test.mocks.dart';
 
-@GenerateMocks([GetPopularTvSeries])
+@GenerateMocks([GetTvSeries])
 void main() {
   late PopularTvSeriesBloc popularTvSeriesBloc;
-  late MockGetPopularTvSeries mockGetPopularTvSeries;
+  late MockGetTvSeries mockGetTvSeries;
+
+  const url = '/tv/popular';
 
   setUp(() {
-    mockGetPopularTvSeries = MockGetPopularTvSeries();
-    popularTvSeriesBloc = PopularTvSeriesBloc(mockGetPopularTvSeries);
+    mockGetTvSeries = MockGetTvSeries();
+    popularTvSeriesBloc = PopularTvSeriesBloc(mockGetTvSeries);
   });
 
   test('initial state should be empty', () {
-    expect(popularTvSeriesBloc.state, PopularTvSeriesEmpty());
+    expect(popularTvSeriesBloc.state, BlocEmpty());
   });
 
-  blocTest<PopularTvSeriesBloc, PopularTvSeriesState>(
+  blocTest<PopularTvSeriesBloc, BlocState>(
     'Should emit [Loading, HasData] when data Popular is gotten successfully',
     build: () {
-      when(mockGetPopularTvSeries.execute())
-          .thenAnswer((_) async => Right(testTvSeriesList));
+      when(
+        mockGetTvSeries.execute(url),
+      ).thenAnswer((_) async => Right(testTvSeriesList));
       return popularTvSeriesBloc;
     },
     act: (bloc) => bloc.add(const OnFetchingPopular()),
-    expect: () => [
-      PopularTvSeriesLoading(),
-      PopularTvSeriesHasData(testTvSeriesList),
-    ],
+    expect: () => [BlocLoading(), BlocHasData(testTvSeriesList)],
     verify: (bloc) {
-      verify(mockGetPopularTvSeries.execute());
+      verify(mockGetTvSeries.execute(url));
     },
   );
 
-  blocTest<PopularTvSeriesBloc, PopularTvSeriesState>(
+  blocTest<PopularTvSeriesBloc, BlocState>(
     'Should emit [Loading, Error] when data Popular is unsuccessful',
     build: () {
-      when(mockGetPopularTvSeries.execute())
-          .thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
+      when(
+        mockGetTvSeries.execute(url),
+      ).thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
       return popularTvSeriesBloc;
     },
     act: (bloc) => bloc.add(const OnFetchingPopular()),
-    expect: () => [
-      PopularTvSeriesLoading(),
-      const PopularTvSeriesError('Server Failure'),
-    ],
+    expect: () => [BlocLoading(), const BlocError('Server Failure')],
     verify: (bloc) {
-      verify(mockGetPopularTvSeries.execute());
+      verify(mockGetTvSeries.execute(url));
     },
   );
 }

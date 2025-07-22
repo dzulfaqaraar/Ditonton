@@ -18,76 +18,102 @@ where:
 }
 
 # run unit and widget tests
-runTests () {
-  cd $1;
-  if [ -f "pubspec.yaml" ] && [ -d "test" ]; then
-    echo "running tests in $1"
-    flutter pub get
-    flutter pub run build_runner build
+runTests() {
+    cd "$1" || exit 1
+    if [ -f "pubspec.yaml" ] && [ -d "test" ]; then
+        echo "running tests in $1"
+        flutter pub get
+        flutter pub run build_runner build
 
-    escapedPath="$(echo $1 | sed 's/\//\\\//g')"
+        escapedPath="$(echo "$1" | sed 's/\//\\\//g')"
 
-    # run tests with coverage
-    if grep flutter pubspec.yaml > /dev/null; then
-      echo "run flutter tests"
-      if [ -f "test/all_tests.dart" ]; then
-        flutter test --coverage test/all_tests.dart || error=true
-      else
-        flutter test --coverage || error=true
-      fi
-      if [ -d "coverage" ]; then
-        # combine line coverage info from package tests to a common file
-        sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >> $2/coverage/lcov.info
-      fi
-    else
-      echo "not a flutter package, skipping"
+        # run tests with coverage
+        if grep flutter pubspec.yaml >/dev/null; then
+            echo "run flutter tests"
+            if [ -f "test/all_tests.dart" ]; then
+                flutter test --coverage test/all_tests.dart || error=true
+            else
+                flutter test --coverage || error=true
+            fi
+            if [ -d "coverage" ]; then
+                # create coverage directory if it doesn't exist
+                mkdir -p "$2/coverage"
+                # combine line coverage info from package tests to a common file
+                sed "s/^SF:lib/SF:$escapedPath\/lib/g" coverage/lcov.info >>"$2/coverage/lcov.info"
+            fi
+        else
+            echo "not a flutter package, skipping"
+        fi
     fi
-  fi
-  cd - > /dev/null
+    cd - >/dev/null || exit 1
 }
 
 runReport() {
-    if [ -f "coverage/lcov.info" ] && ! [ "$TRAVIS" ]; then
-        # genhtml coverage/lcov.info -o coverage --no-function-coverage -s -p `pwd`/coverage
-        ./genhtml.perl coverage/lcov.info -o coverage --no-function-coverage -s -p `pwd`/coverage
-        
-		if $IsWindows || $ENV:OS; then
-			start coverage/index.html
-		else
-			open coverage/index.html
-		fi
+    OUTPUT_DIR="coverage"
+    LCOV_FILE="$OUTPUT_DIR/lcov.info"
+    
+    # Check if running on GitHub Actions
+    if [[ "$GITHUB_ACTIONS" == "true" ]]; then
+        echo "Running on GitHub Actions (Ubuntu)"
+        genhtml "$LCOV_FILE" -o "$OUTPUT_DIR" --no-function-coverage -s -p "$(pwd)/$OUTPUT_DIR"
+    else
+        echo "Running locally on $OSTYPE"
+        if [ -f "coverage/lcov.info" ] && ! [ "$TRAVIS" ]; then
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                echo "Running on macOS"
+                genhtml "$LCOV_FILE" -o "$OUTPUT_DIR" --no-function-coverage -s -p "$(pwd)/$OUTPUT_DIR"
+            elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+                echo "Running on Windows"
+                ./genhtml.perl "$LCOV_FILE" -o "$OUTPUT_DIR" --no-function-coverage -s -p "$(pwd)/$OUTPUT_DIR"
+            else
+                echo "Unsupported OS: $OSTYPE"
+                exit 1
+            fi
+
+            if [[ "$OSTYPE" == "darwin"* ]]; then
+                open "$OUTPUT_DIR/index.html"
+            elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+                start "$OUTPUT_DIR/index.html"
+            else
+                echo "Coverage report generated at $OUTPUT_DIR/index.html"
+            fi
+        fi
     fi
 }
 
-if ! [ -d .git ]; then printf "\nError: not in root of repo"; show_help; fi
+if ! [ -d .git ]; then
+    printf "\nError: not in root of repo"
+    show_help
+fi
 
 case $1 in
-    --help)
-        show_help
-        ;;
-    *)
-        currentDir=`pwd`
-        # if no parameter passed
-        if [ -z $1 ]; then
-            rm -f coverage/lcov.info
-            dirs=(`find . -maxdepth 2 -type d`)
-            for dir in "${dirs[@]}"; do
-                runTests $dir $currentDir
-            done
+--help)
+    show_help
+    ;;
+*)
+    currentDir=$(pwd)
+    # if no parameter passed
+    if [ -z "$1" ]; then
+        # delete and recreate coverage directory
+        rm -rf coverage
+        mkdir -p coverage
+        dirs=($(find . -maxdepth 2 -type d))
+        for dir in "${dirs[@]}"; do
+            runTests "$dir" "$currentDir"
+        done
+    else
+        if [[ -d "$1" ]]; then
+            runTests "$1" "$currentDir"
         else
-            if [[ -d "$1" ]]; then
-                runTests $1 $currentDir
-            else
-                printf "\nError: not a directory: $1"
-                show_help
-            fi
+            printf "\nError: not a directory: $1"
+            show_help
         fi
-        runReport
-        ;;
+    fi
+    runReport
+    ;;
 esac
 
 # Fail the build if there was an error
-if [ "$error" = true ] ;
-then
-    exit -1
+if [ "$error" = true ]; then
+    exit 1
 fi

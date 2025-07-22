@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -38,87 +39,81 @@ void main() {
   });
 
   test('initial state should be empty', () {
-    expect(tvSeriesWatchlistBloc.state, TvSeriesWatchlistEmpty());
+    expect(tvSeriesWatchlistBloc.state, BlocEmpty());
   });
 
-  blocTest<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
+  blocTest<TvSeriesWatchlistBloc, BlocState>(
     'Should emit [HasMessage] when loading Watchlist is gotten successfully',
     build: () {
       when(mockGetWatchListStatus.execute(1)).thenAnswer((_) async => true);
       return tvSeriesWatchlistBloc;
     },
     act: (bloc) => bloc.add(const OnLoadingWatchlist(1)),
-    expect: () => [
-      const TvSeriesWatchlistHasMessage(true, null),
-    ],
+    expect: () => [const TvSeriesWatchlistHasMessage(true, null)],
     verify: (bloc) {
       verify(mockGetWatchListStatus.execute(1));
     },
   );
 
-  blocTest<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
+  blocTest<TvSeriesWatchlistBloc, BlocState>(
     'Should emit [HasMessage] when adding Watchlist is successfully',
     build: () {
       when(mockGetWatchListStatus.execute(1)).thenAnswer((_) async => true);
-      when(mockSaveWatchlistTvSeries.execute(testTvSeriesDetail))
-          .thenAnswer((_) async => Right(addedMessage));
+      when(
+        mockSaveWatchlistTvSeries.execute(testTvSeriesDetail),
+      ).thenAnswer((_) async => Right(addedMessage));
       return tvSeriesWatchlistBloc;
     },
     act: (bloc) => bloc.add(const OnAddingWatchlist(testTvSeriesDetail)),
-    expect: () => [
-      TvSeriesWatchlistHasMessage(true, addedMessage),
-    ],
+    expect: () => [TvSeriesWatchlistHasMessage(true, addedMessage)],
     verify: (bloc) {
       verify(mockSaveWatchlistTvSeries.execute(testTvSeriesDetail));
     },
   );
 
-  blocTest<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
+  blocTest<TvSeriesWatchlistBloc, BlocState>(
     'Should emit [HasMessage] when adding Watchlist is unsuccessfully',
     build: () {
       when(mockGetWatchListStatus.execute(1)).thenAnswer((_) async => false);
-      when(mockSaveWatchlistTvSeries.execute(testTvSeriesDetail)).thenAnswer(
-          (_) async => Left(DatabaseFailure(failedAddingWatchlist)));
+      when(
+        mockSaveWatchlistTvSeries.execute(testTvSeriesDetail),
+      ).thenAnswer((_) async => Left(DatabaseFailure(failedAddingWatchlist)));
       return tvSeriesWatchlistBloc;
     },
     act: (bloc) => bloc.add(const OnAddingWatchlist(testTvSeriesDetail)),
-    expect: () => [
-      TvSeriesWatchlistHasMessage(false, failedAddingWatchlist),
-    ],
+    expect: () => [TvSeriesWatchlistHasMessage(false, failedAddingWatchlist)],
     verify: (bloc) {
       verify(mockSaveWatchlistTvSeries.execute(testTvSeriesDetail));
     },
   );
 
-  blocTest<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
+  blocTest<TvSeriesWatchlistBloc, BlocState>(
     'Should emit [HasMessage] when removing Watchlist is successfully',
     build: () {
       when(mockGetWatchListStatus.execute(1)).thenAnswer((_) async => true);
-      when(mockRemoveWatchlistTvSeries.execute(testTvSeriesDetail))
-          .thenAnswer((_) async => Right(removedMessage));
+      when(
+        mockRemoveWatchlistTvSeries.execute(testTvSeriesDetail),
+      ).thenAnswer((_) async => Right(removedMessage));
       return tvSeriesWatchlistBloc;
     },
     act: (bloc) => bloc.add(const OnRemovingWatchlist(testTvSeriesDetail)),
-    expect: () => [
-      TvSeriesWatchlistHasMessage(true, removedMessage),
-    ],
+    expect: () => [TvSeriesWatchlistHasMessage(true, removedMessage)],
     verify: (bloc) {
       verify(mockRemoveWatchlistTvSeries.execute(testTvSeriesDetail));
     },
   );
 
-  blocTest<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
+  blocTest<TvSeriesWatchlistBloc, BlocState>(
     'Should emit [HasMessage] when removing Watchlist is unsuccessfully',
     build: () {
       when(mockGetWatchListStatus.execute(1)).thenAnswer((_) async => false);
-      when(mockRemoveWatchlistTvSeries.execute(testTvSeriesDetail)).thenAnswer(
-          (_) async => Left(DatabaseFailure(failedRemovingWatchlist)));
+      when(
+        mockRemoveWatchlistTvSeries.execute(testTvSeriesDetail),
+      ).thenAnswer((_) async => Left(DatabaseFailure(failedRemovingWatchlist)));
       return tvSeriesWatchlistBloc;
     },
     act: (bloc) => bloc.add(const OnRemovingWatchlist(testTvSeriesDetail)),
-    expect: () => [
-      TvSeriesWatchlistHasMessage(false, failedRemovingWatchlist),
-    ],
+    expect: () => [TvSeriesWatchlistHasMessage(false, failedRemovingWatchlist)],
     verify: (bloc) {
       verify(mockRemoveWatchlistTvSeries.execute(testTvSeriesDetail));
     },

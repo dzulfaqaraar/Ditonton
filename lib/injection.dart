@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:core/core.dart';
+import 'package:core/domain/usecase/get_movies.dart';
+import 'package:core/domain/usecase/get_tvseries.dart';
 import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/io_client.dart';
@@ -12,9 +14,10 @@ import 'package:watchlist/watchlist.dart';
 final locator = GetIt.instance;
 
 void init(ByteData sslCert) {
-  // bloc
-  locator.registerFactory(() => SearchBloc(locator(), locator()));
-  locator.registerFactory(() => WatchlistBloc(locator()));
+  // bloc movies
+  locator.registerFactory(() => MovieListBloc(locator()));
+  locator.registerFactory(() => PopularMoviesBloc(locator()));
+  locator.registerFactory(() => TopRatedMoviesBloc(locator()));
   locator.registerFactory(() => MovieDetailBloc(locator()));
   locator.registerFactory(() => MovieRecommendationBloc(locator()));
   locator.registerFactory(
@@ -24,9 +27,8 @@ void init(ByteData sslCert) {
       removeWatchlist: locator(),
     ),
   );
-  locator.registerFactory(() => PopularMoviesBloc(locator()));
-  locator.registerFactory(() => TopRatedMoviesBloc(locator()));
-  locator.registerFactory(() => MovieListBloc(locator()));
+
+  // bloc tv series
   locator.registerFactory(() => AiringTodayTvSeriesBloc(locator()));
   locator.registerFactory(() => PopularTvSeriesBloc(locator()));
   locator.registerFactory(() => TopRatedTvSeriesBloc(locator()));
@@ -41,27 +43,30 @@ void init(ByteData sslCert) {
   );
   locator.registerFactory(() => TvSeriesEpisodeBloc(locator()));
 
-  // use case
-  locator.registerLazySingleton(() => GetNowPlayingMovies(locator()));
-  locator.registerLazySingleton(() => GetPopularMovies(locator()));
-  locator.registerLazySingleton(() => GetTopRatedMovies(locator()));
+  // bloc other
+  locator.registerFactory(() => SearchBloc(locator(), locator()));
+  locator.registerFactory(() => WatchlistBloc(locator()));
+
+  // use case movies
+  locator.registerLazySingleton(() => GetMovies(locator()));
   locator.registerLazySingleton(() => GetMovieDetail(locator()));
   locator.registerLazySingleton(() => GetMovieRecommendations(locator()));
   locator.registerLazySingleton(() => SearchMovies(locator()));
-  locator.registerLazySingleton(() => GetWatchListStatus(locator()));
   locator.registerLazySingleton(() => SaveWatchlistMovies(locator()));
   locator.registerLazySingleton(() => RemoveWatchlistMovies(locator()));
-  locator.registerLazySingleton(() => GetWatchlistData(locator()));
 
-  locator.registerLazySingleton(() => GetAiringTodayTvSeries(locator()));
-  locator.registerLazySingleton(() => GetPopularTvSeries(locator()));
-  locator.registerLazySingleton(() => GetTopRatedTvSeries(locator()));
+  // use case tv series
+  locator.registerLazySingleton(() => GetTvSeries(locator()));
   locator.registerLazySingleton(() => GetTvSeriesDetail(locator()));
   locator.registerLazySingleton(() => GetTvSeriesRecommendations(locator()));
+  locator.registerLazySingleton(() => GetTvSeriesEpisode(locator()));
+  locator.registerLazySingleton(() => SearchTvSeries(locator()));
   locator.registerLazySingleton(() => SaveWatchlistTvSeries(locator()));
   locator.registerLazySingleton(() => RemoveWatchlistTvSeries(locator()));
-  locator.registerLazySingleton(() => SearchTvSeries(locator()));
-  locator.registerLazySingleton(() => GetTvSeriesEpisode(locator()));
+
+  // use case other
+  locator.registerLazySingleton(() => GetWatchListStatus(locator()));
+  locator.registerLazySingleton(() => GetWatchlistData(locator()));
 
   // repository
   locator.registerLazySingleton<MovieRepository>(
@@ -73,9 +78,11 @@ void init(ByteData sslCert) {
 
   // data sources
   locator.registerLazySingleton<MovieRemoteDataSource>(
-      () => MovieRemoteDataSourceImpl(client: locator()));
+    () => MovieRemoteDataSourceImpl(client: locator()),
+  );
   locator.registerLazySingleton<MovieLocalDataSource>(
-      () => MovieLocalDataSourceImpl(databaseHelper: locator()));
+    () => MovieLocalDataSourceImpl(databaseHelper: locator()),
+  );
 
   // helper
   locator.registerLazySingleton<DatabaseHelper>(() => DatabaseHelper());

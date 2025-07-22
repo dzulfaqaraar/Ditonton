@@ -1,11 +1,12 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:search/presentation/bloc/search_bloc.dart';
 
 class SearchPage extends StatelessWidget {
   final bool isMovies;
-  const SearchPage({Key? key, required this.isMovies}) : super(key: key);
+  const SearchPage({super.key, required this.isMovies});
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +37,7 @@ class SearchPage extends StatelessWidget {
               textInputAction: TextInputAction.search,
             ),
             const SizedBox(height: 16),
-            Text(
-              'Search Result',
-              style: titleMedium,
-            ),
+            Text('Search Result', style: titleLarge),
             isMovies ? listMovies() : listTvSeries(),
           ],
         ),
@@ -48,23 +46,16 @@ class SearchPage extends StatelessWidget {
   }
 
   Widget listMovies() {
-    return BlocBuilder<SearchBloc, SearchState>(
+    return BlocBuilder<SearchBloc, BlocState>(
       builder: (context, state) {
-        if (state is SearchLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is SearchHasDataMovie) {
+        if (state is BlocLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is BlocHasData<List<Movie>>) {
           final result = state.result;
 
           if (result.isEmpty) {
             return Expanded(
-              child: Center(
-                child: Text(
-                  'No data',
-                  style: titleMedium,
-                ),
-              ),
+              child: Center(child: Text('No data', style: titleLarge)),
             );
           } else {
             return Expanded(
@@ -78,7 +69,7 @@ class SearchPage extends StatelessWidget {
               ),
             );
           }
-        } else if (state is SearchError) {
+        } else if (state is BlocError) {
           return Expanded(
             child: Center(
               key: const Key('error_message'),
@@ -86,32 +77,23 @@ class SearchPage extends StatelessWidget {
             ),
           );
         } else {
-          return Expanded(
-            child: Container(),
-          );
+          return Expanded(child: Container());
         }
       },
     );
   }
 
   Widget listTvSeries() {
-    return BlocBuilder<SearchBloc, SearchState>(
+    return BlocBuilder<SearchBloc, BlocState>(
       builder: (context, state) {
-        if (state is SearchLoading) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        } else if (state is SearchHasDataTvSeries) {
+        if (state is BlocLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is BlocHasData<List<TvSeries>>) {
           final result = state.result;
 
           if (result.isEmpty) {
             return Expanded(
-              child: Center(
-                child: Text(
-                  'No data',
-                  style: titleMedium,
-                ),
-              ),
+              child: Center(child: Text('No data', style: titleLarge)),
             );
           } else {
             return Expanded(
@@ -125,7 +107,7 @@ class SearchPage extends StatelessWidget {
               ),
             );
           }
-        } else if (state is SearchError) {
+        } else if (state is BlocError) {
           return Expanded(
             child: Center(
               key: const Key('error_message'),
@@ -133,9 +115,7 @@ class SearchPage extends StatelessWidget {
             ),
           );
         } else {
-          return Expanded(
-            child: Container(),
-          );
+          return Expanded(child: Container());
         }
       },
     );

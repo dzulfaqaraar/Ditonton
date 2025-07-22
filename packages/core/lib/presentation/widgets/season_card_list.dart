@@ -6,11 +6,7 @@ class SeasonCard extends StatelessWidget {
   final TvSeriesDetail tvSeries;
   final Season season;
 
-  const SeasonCard({
-    Key? key,
-    required this.tvSeries,
-    required this.season,
-  }) : super(key: key);
+  const SeasonCard({super.key, required this.tvSeries, required this.season});
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +45,7 @@ class SeasonCard extends StatelessWidget {
                             season.name ?? '-',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: titleMedium,
+                            style: titleLarge,
                           ),
                           Row(
                             children: [
@@ -63,8 +59,9 @@ class SeasonCard extends StatelessWidget {
                                 const SizedBox(
                                   height: 12,
                                   child: Padding(
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 8),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                    ),
                                     child: VerticalDivider(
                                       thickness: 1,
                                       width: 1,
@@ -96,19 +93,15 @@ class SeasonCard extends StatelessWidget {
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(
-                left: 16,
-                bottom: 16,
-              ),
+              margin: const EdgeInsets.only(left: 16, bottom: 16),
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: CachedNetworkImage(
                   key: const Key('season_image'),
                   imageUrl: '$baseImageUrl${season.posterPath}',
                   width: 80,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),

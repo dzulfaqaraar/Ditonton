@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_series/tv_series.dart';
 
 class TvSeriesPage extends StatefulWidget {
-  const TvSeriesPage({Key? key}) : super(key: key);
+  const TvSeriesPage({super.key});
 
   @override
   State<TvSeriesPage> createState() => _TvSeriesPageState();
@@ -16,11 +17,13 @@ class _TvSeriesPageState extends State<TvSeriesPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context
-          .read<AiringTodayTvSeriesBloc>()
-          .add(const OnFetchingAiringToday());
-      context.read<PopularTvSeriesBloc>().add(const OnFetchingPopular());
-      context.read<TopRatedTvSeriesBloc>().add(const OnFetchingTopRated());
+      if (mounted) {
+        context.read<AiringTodayTvSeriesBloc>().add(
+          const OnFetchingAiringToday(),
+        );
+        context.read<PopularTvSeriesBloc>().add(const OnFetchingPopular());
+        context.read<TopRatedTvSeriesBloc>().add(const OnFetchingTopRated());
+      }
     });
   }
 
@@ -37,50 +40,47 @@ class _TvSeriesPageState extends State<TvSeriesPage> {
               onTap: () =>
                   Navigator.pushNamed(context, airingTodayTvSeriesRoute),
             ),
-            BlocBuilder<AiringTodayTvSeriesBloc, AiringTodayTvSeriesState>(
-                builder: (context, state) {
-              if (state is AiringTodayTvSeriesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is AiringTodayTvSeriesHasData) {
-                return TvSeriesList(tvSeriesList: state.result);
-              } else {
-                return const Text('Failed');
-              }
-            }),
+            BlocBuilder<AiringTodayTvSeriesBloc, BlocState>(
+              builder: (context, state) {
+                if (state is BlocLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BlocHasData<List<TvSeries>>) {
+                  return TvSeriesList(tvSeriesList: state.result);
+                } else {
+                  return const Text('Failed');
+                }
+              },
+            ),
             SubHeadingView(
               title: 'Popular',
               onTap: () => Navigator.pushNamed(context, popularTvSeriesRoute),
             ),
-            BlocBuilder<PopularTvSeriesBloc, PopularTvSeriesState>(
-                builder: (context, state) {
-              if (state is PopularTvSeriesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is PopularTvSeriesHasData) {
-                return TvSeriesList(tvSeriesList: state.result);
-              } else {
-                return const Text('Failed');
-              }
-            }),
+            BlocBuilder<PopularTvSeriesBloc, BlocState>(
+              builder: (context, state) {
+                if (state is BlocLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BlocHasData<List<TvSeries>>) {
+                  return TvSeriesList(tvSeriesList: state.result);
+                } else {
+                  return const Text('Failed');
+                }
+              },
+            ),
             SubHeadingView(
               title: 'Top Rated',
               onTap: () => Navigator.pushNamed(context, topRatedTvSeriesRoute),
             ),
-            BlocBuilder<TopRatedTvSeriesBloc, TopRatedTvSeriesState>(
-                builder: (context, state) {
-              if (state is TopRatedTvSeriesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is TopRatedTvSeriesHasData) {
-                return TvSeriesList(tvSeriesList: state.result);
-              } else {
-                return const Text('Failed');
-              }
-            }),
+            BlocBuilder<TopRatedTvSeriesBloc, BlocState>(
+              builder: (context, state) {
+                if (state is BlocLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BlocHasData<List<TvSeries>>) {
+                  return TvSeriesList(tvSeriesList: state.result);
+                } else {
+                  return const Text('Failed');
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -91,10 +91,7 @@ class _TvSeriesPageState extends State<TvSeriesPage> {
 class TvSeriesList extends StatelessWidget {
   final List<TvSeries> tvSeriesList;
 
-  const TvSeriesList({
-    Key? key,
-    required this.tvSeriesList,
-  }) : super(key: key);
+  const TvSeriesList({super.key, required this.tvSeriesList});
 
   @override
   Widget build(BuildContext context) {
@@ -119,9 +116,8 @@ class TvSeriesList extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
                 child: CachedNetworkImage(
                   imageUrl: '$baseImageUrl${tvSeries.posterPath}',
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),

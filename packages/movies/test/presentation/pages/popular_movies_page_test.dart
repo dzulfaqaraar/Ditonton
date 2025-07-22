@@ -1,3 +1,4 @@
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,26 +17,26 @@ void main() {
     mockPopularMoviesBloc = MockPopularMoviesBloc();
   });
 
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<PopularMoviesBloc>(
           create: (context) => mockPopularMoviesBloc,
         ),
       ],
-      child: MaterialApp(
-        home: body,
-      ),
+      child: MaterialApp(home: body),
     );
   }
 
-  testWidgets('Page should display center progress bar when loading',
-      (WidgetTester tester) async {
-    when(mockPopularMoviesBloc.state).thenReturn(PopularMoviesLoading());
-    when(mockPopularMoviesBloc.stream)
-        .thenAnswer((_) => Stream.value(PopularMoviesLoading()));
+  testWidgets('Page should display center progress bar when loading', (
+    WidgetTester tester,
+  ) async {
+    when(mockPopularMoviesBloc.state).thenReturn(BlocLoading());
+    when(
+      mockPopularMoviesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
 
-    await tester.pumpWidget(_makeTestableWidget(const PopularMoviesPage()));
+    await tester.pumpWidget(makeTestableWidget(const PopularMoviesPage()));
 
     final progressBarFinder = find.byType(CircularProgressIndicator);
     final centerFinder = find.byType(Center);
@@ -44,27 +45,31 @@ void main() {
     expect(progressBarFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    when(mockPopularMoviesBloc.state)
-        .thenReturn(PopularMoviesHasData(testMovieList));
-    when(mockPopularMoviesBloc.stream)
-        .thenAnswer((_) => Stream.value(PopularMoviesHasData(testMovieList)));
+  testWidgets('Page should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    when(mockPopularMoviesBloc.state).thenReturn(BlocHasData(testMovieList));
+    when(
+      mockPopularMoviesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testMovieList)));
 
-    await tester.pumpWidget(_makeTestableWidget(const PopularMoviesPage()));
+    await tester.pumpWidget(makeTestableWidget(const PopularMoviesPage()));
 
     final listViewFinder = find.byType(ListView);
     expect(listViewFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display text with message when Error',
-      (WidgetTester tester) async {
-    when(mockPopularMoviesBloc.state)
-        .thenReturn(const PopularMoviesError('Error message'));
-    when(mockPopularMoviesBloc.stream).thenAnswer(
-        (_) => Stream.value(const PopularMoviesError('Error message')));
+  testWidgets('Page should display text with message when Error', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockPopularMoviesBloc.state,
+    ).thenReturn(const BlocError('Error message'));
+    when(
+      mockPopularMoviesBloc.stream,
+    ).thenAnswer((_) => Stream.value(const BlocError('Error message')));
 
-    await tester.pumpWidget(_makeTestableWidget(const PopularMoviesPage()));
+    await tester.pumpWidget(makeTestableWidget(const PopularMoviesPage()));
 
     final textFinder = find.byKey(const Key('error_message'));
     expect(textFinder, findsOneWidget);

@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -24,76 +25,71 @@ void main() {
   });
 
   test('initial state should be empty', () {
-    expect(searchBloc.state, SearchEmpty());
+    expect(searchBloc.state, BlocEmpty());
   });
 
-  blocTest<SearchBloc, SearchState>(
+  blocTest<SearchBloc, BlocState>(
     'Should emit [Loading, HasData] when data movie is gotten successfully',
     build: () {
-      when(mockSearchMovies.execute(testMovieQuery))
-          .thenAnswer((_) async => Right(tMovieList));
+      when(
+        mockSearchMovies.execute(testMovieQuery),
+      ).thenAnswer((_) async => Right(tMovieList));
       return searchBloc;
     },
     act: (bloc) => bloc.add(const OnQueryChangedMovie(testMovieQuery)),
     wait: const Duration(milliseconds: 500),
-    expect: () => [
-      SearchLoading(),
-      SearchHasDataMovie(tMovieList),
-    ],
+    expect: () => [BlocLoading(), BlocHasData<List<Movie>>(tMovieList)],
     verify: (bloc) {
       verify(mockSearchMovies.execute(testMovieQuery));
     },
   );
 
-  blocTest<SearchBloc, SearchState>(
+  blocTest<SearchBloc, BlocState>(
     'Should emit [Loading, Error] when get search movie is unsuccessful',
     build: () {
-      when(mockSearchMovies.execute(testMovieQuery))
-          .thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
+      when(
+        mockSearchMovies.execute(testMovieQuery),
+      ).thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
       return searchBloc;
     },
     act: (bloc) => bloc.add(const OnQueryChangedMovie(testMovieQuery)),
     wait: const Duration(milliseconds: 500),
-    expect: () => [
-      SearchLoading(),
-      const SearchError('Server Failure'),
-    ],
+    expect: () => [BlocLoading(), const BlocError('Server Failure')],
     verify: (bloc) {
       verify(mockSearchMovies.execute(testMovieQuery));
     },
   );
 
-  blocTest<SearchBloc, SearchState>(
+  blocTest<SearchBloc, BlocState>(
     'Should emit [Loading, HasData] when data tv series is gotten successfully',
     build: () {
-      when(mockSearchTvSeries.execute(testTvSeriesQuery))
-          .thenAnswer((_) async => Right(testTvSeriesList));
+      when(
+        mockSearchTvSeries.execute(testTvSeriesQuery),
+      ).thenAnswer((_) async => Right(testTvSeriesList));
       return searchBloc;
     },
     act: (bloc) => bloc.add(const OnQueryChangedTvSeries(testTvSeriesQuery)),
     wait: const Duration(milliseconds: 500),
     expect: () => [
-      SearchLoading(),
-      SearchHasDataTvSeries(testTvSeriesList),
+      BlocLoading(),
+      BlocHasData<List<TvSeries>>(testTvSeriesList),
     ],
     verify: (bloc) {
       verify(mockSearchTvSeries.execute(testTvSeriesQuery));
     },
   );
 
-  blocTest<SearchBloc, SearchState>(
+  blocTest<SearchBloc, BlocState>(
     'Should emit [Loading, Error] when get search tv series is unsuccessful',
     build: () {
-      when(mockSearchTvSeries.execute(testTvSeriesQuery))
-          .thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
+      when(
+        mockSearchTvSeries.execute(testTvSeriesQuery),
+      ).thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
       return searchBloc;
     },
     act: (bloc) => bloc.add(const OnQueryChangedTvSeries(testTvSeriesQuery)),
     wait: const Duration(milliseconds: 500),
-    expect: () => [
-      SearchLoading(),
-      const SearchError('Server Failure'),
-    ],
+    expect: () => [BlocLoading(), const BlocError('Server Failure')],
     verify: (bloc) {
       verify(mockSearchTvSeries.execute(testTvSeriesQuery));
     },

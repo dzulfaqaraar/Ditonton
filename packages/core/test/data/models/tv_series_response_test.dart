@@ -14,14 +14,16 @@ void main() {
         'Car mechanic Eloy makes a terrible first impression on Ali, who works for a real estate magnate. But both of them are hiding their true personas.',
     posterPath: '/2Wf5ySCPcnp8lRhbSD7jt0YLz5A.jpg',
   );
-  const tvSeriesResponse =
-      TvSeriesResponse(tvSeriesList: <TvSeriesModel>[tvSeriesModel]);
+  const tvSeriesResponse = TvSeriesResponse(
+    tvSeriesList: <TvSeriesModel>[tvSeriesModel],
+  );
 
   group('fromJson', () {
     test('should return a valid model from JSON', () async {
       // arrange
-      final Map<String, dynamic> jsonMap =
-          json.decode(readJson('dummy_data/tv_series_airing_today.json'));
+      final Map<String, dynamic> jsonMap = json.decode(
+        readJson('dummy_data/tv_series_airing_today.json'),
+      );
       // act
       final result = TvSeriesResponse.fromJson(jsonMap);
       // assert
@@ -42,7 +44,7 @@ void main() {
             'overview':
                 'Car mechanic Eloy makes a terrible first impression on Ali, who works for a real estate magnate. But both of them are hiding their true personas.',
             'poster_path': '/2Wf5ySCPcnp8lRhbSD7jt0YLz5A.jpg',
-          }
+          },
         ],
       };
       expect(result, expectedJsonMap);

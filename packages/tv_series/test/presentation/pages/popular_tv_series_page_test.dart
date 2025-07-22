@@ -1,3 +1,4 @@
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,26 +17,26 @@ void main() {
     mockPopularTvSeriesBloc = MockPopularTvSeriesBloc();
   });
 
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<PopularTvSeriesBloc>(
           create: (context) => mockPopularTvSeriesBloc,
         ),
       ],
-      child: MaterialApp(
-        home: body,
-      ),
+      child: MaterialApp(home: body),
     );
   }
 
-  testWidgets('Page should display center progress bar when loading',
-      (WidgetTester tester) async {
-    when(mockPopularTvSeriesBloc.state).thenReturn(PopularTvSeriesLoading());
-    when(mockPopularTvSeriesBloc.stream)
-        .thenAnswer((_) => Stream.value(PopularTvSeriesLoading()));
+  testWidgets('Page should display center progress bar when loading', (
+    WidgetTester tester,
+  ) async {
+    when(mockPopularTvSeriesBloc.state).thenReturn(BlocLoading());
+    when(
+      mockPopularTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
 
-    await tester.pumpWidget(_makeTestableWidget(const PopularTvSeriesPage()));
+    await tester.pumpWidget(makeTestableWidget(const PopularTvSeriesPage()));
 
     final progressBarFinder = find.byType(CircularProgressIndicator);
     final centerFinder = find.byType(Center);
@@ -44,27 +45,33 @@ void main() {
     expect(progressBarFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    when(mockPopularTvSeriesBloc.state)
-        .thenReturn(PopularTvSeriesHasData(testTvSeriesList));
-    when(mockPopularTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(PopularTvSeriesHasData(testTvSeriesList)));
+  testWidgets('Page should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockPopularTvSeriesBloc.state,
+    ).thenReturn(BlocHasData(testTvSeriesList));
+    when(
+      mockPopularTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testTvSeriesList)));
 
-    await tester.pumpWidget(_makeTestableWidget(const PopularTvSeriesPage()));
+    await tester.pumpWidget(makeTestableWidget(const PopularTvSeriesPage()));
 
     final listViewFinder = find.byType(ListView);
     expect(listViewFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display text with message when Error',
-      (WidgetTester tester) async {
-    when(mockPopularTvSeriesBloc.state)
-        .thenReturn(const PopularTvSeriesError('Error message'));
-    when(mockPopularTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(const PopularTvSeriesError('Error message')));
+  testWidgets('Page should display text with message when Error', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockPopularTvSeriesBloc.state,
+    ).thenReturn(const BlocError('Error message'));
+    when(
+      mockPopularTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(const BlocError('Error message')));
 
-    await tester.pumpWidget(_makeTestableWidget(const PopularTvSeriesPage()));
+    await tester.pumpWidget(makeTestableWidget(const PopularTvSeriesPage()));
 
     final textFinder = find.byKey(const Key('error_message'));
     expect(textFinder, findsOneWidget);

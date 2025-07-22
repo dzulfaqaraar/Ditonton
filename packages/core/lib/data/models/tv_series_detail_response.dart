@@ -31,24 +31,27 @@ class TvSeriesDetailResponse extends Equatable {
         overview: json["overview"],
         posterPath: json["poster_path"],
         genres: List<GenreModel>.from(
-            json["genres"].map((x) => GenreModel.fromJson(x))),
+          json["genres"].map((x) => GenreModel.fromJson(x)),
+        ),
         voteAverage: json["vote_average"].toDouble(),
         episodeRunTime: List<int>.from(json["episode_run_time"].map((x) => x)),
-        seasons: List<SeasonResponse>.from(json["seasons"]
-            .map((x) => SeasonResponse.fromJson(x))
-            .where((element) => element.posterPath != null)),
+        seasons: List<SeasonResponse>.from(
+          json["seasons"]
+              .map((x) => SeasonResponse.fromJson(x))
+              .where((element) => element.posterPath != null),
+        ),
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "overview": overview,
-        "poster_path": posterPath,
-        "genres": genres.map((x) => x.toJson()).toList(),
-        "vote_average": voteAverage,
-        "episode_run_time": episodeRunTime?.map((x) => x).toList(),
-        "seasons": seasons?.map((x) => x.toJson()).toList(),
-      };
+    "id": id,
+    "name": name,
+    "overview": overview,
+    "poster_path": posterPath,
+    "genres": genres.map((x) => x.toJson()).toList(),
+    "vote_average": voteAverage,
+    "episode_run_time": episodeRunTime?.map((x) => x).toList(),
+    "seasons": seasons?.map((x) => x.toJson()).toList(),
+  };
 
   @override
   List<Object?> get props {
@@ -98,24 +101,24 @@ class SeasonResponse extends Equatable {
   final int? seasonNumber;
 
   factory SeasonResponse.fromJson(Map<String, dynamic> json) => SeasonResponse(
-        airDate: json["air_date"],
-        episodeCount: json["episode_count"],
-        id: json["id"],
-        name: json["name"],
-        overview: json["overview"],
-        posterPath: json["poster_path"],
-        seasonNumber: json["season_number"],
-      );
+    airDate: json["air_date"],
+    episodeCount: json["episode_count"],
+    id: json["id"],
+    name: json["name"],
+    overview: json["overview"],
+    posterPath: json["poster_path"],
+    seasonNumber: json["season_number"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "air_date": airDate,
-        "episode_count": episodeCount,
-        "id": id,
-        "name": name,
-        "overview": overview,
-        "poster_path": posterPath,
-        "season_number": seasonNumber,
-      };
+    "air_date": airDate,
+    "episode_count": episodeCount,
+    "id": id,
+    "name": name,
+    "overview": overview,
+    "poster_path": posterPath,
+    "season_number": seasonNumber,
+  };
 
   Season toEntity() {
     return Season(

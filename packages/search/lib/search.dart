@@ -1,5 +1,3 @@
-library search;
-
 export 'domain/usecases/search_movies.dart';
 export 'domain/usecases/search_tv_series.dart';
 

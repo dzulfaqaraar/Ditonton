@@ -39,7 +39,7 @@ void main() {
         "title": 'Title',
         "posterPath": '/path.jpg',
         "overview": 'Overview',
-        'isMovies': 1
+        'isMovies': 1,
       };
       expect(result, expectedJsonMap);
     });

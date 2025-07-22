@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,21 +21,19 @@ void main() {
   Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<WatchlistBloc>(
-          create: (context) => mockWatchlistBloc,
-        ),
+        BlocProvider<WatchlistBloc>(create: (context) => mockWatchlistBloc),
       ],
-      child: MaterialApp(
-        home: body,
-      ),
+      child: MaterialApp(home: body),
     );
   }
 
-  testWidgets('Page should display center progress bar when loading',
-      (WidgetTester tester) async {
-    when(mockWatchlistBloc.state).thenReturn(WatchlistLoading());
-    when(mockWatchlistBloc.stream)
-        .thenAnswer((_) => Stream.value(WatchlistLoading()));
+  testWidgets('Page should display center progress bar when loading', (
+    WidgetTester tester,
+  ) async {
+    when(mockWatchlistBloc.state).thenReturn(BlocLoading());
+    when(
+      mockWatchlistBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
 
     await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
@@ -45,53 +44,65 @@ void main() {
     expect(progressBarFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    when(mockWatchlistBloc.state)
-        .thenReturn(WatchlistHasData(testListOfWatchlist));
-    when(mockWatchlistBloc.stream)
-        .thenAnswer((_) => Stream.value(WatchlistHasData(testListOfWatchlist)));
+  testWidgets('Page should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    when(mockWatchlistBloc.state).thenReturn(BlocHasData(testListOfWatchlist));
+    when(
+      mockWatchlistBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testListOfWatchlist)));
 
     await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
     final listViewFinder = find.byType(ListView);
     expect(listViewFinder, findsOneWidget);
 
-    final movieCardViewFinder =
-        find.descendant(of: listViewFinder, matching: find.byType(MovieCard));
+    final movieCardViewFinder = find.descendant(
+      of: listViewFinder,
+      matching: find.byType(MovieCard),
+    );
     expect(movieCardViewFinder, findsOneWidget);
 
     final tvSeriesCardViewFinder = find.descendant(
-        of: listViewFinder, matching: find.byType(TvSeriesCard));
+      of: listViewFinder,
+      matching: find.byType(TvSeriesCard),
+    );
     expect(tvSeriesCardViewFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display Text when data is empty',
-      (WidgetTester tester) async {
-    when(mockWatchlistBloc.state).thenReturn(const WatchlistHasData([]));
-    when(mockWatchlistBloc.stream)
-        .thenAnswer((_) => Stream.value(const WatchlistHasData([])));
+  testWidgets('Page should display Text when data is empty', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockWatchlistBloc.state,
+    ).thenReturn(const BlocHasData<List<Watchlist>>([]));
+    when(
+      mockWatchlistBloc.stream,
+    ).thenAnswer((_) => Stream.value(const BlocHasData<List<Watchlist>>([])));
 
     await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 
     final centerFinder = find.byType(Center);
     expect(centerFinder, findsOneWidget);
 
-    final textFinder =
-        find.descendant(of: centerFinder, matching: find.byType(Text));
+    final textFinder = find.descendant(
+      of: centerFinder,
+      matching: find.byType(Text),
+    );
     expect(textFinder, findsOneWidget);
 
     Text text = tester.widget(textFinder);
     expect(text.data, 'No data');
-    expect(text.style, titleMedium);
+    expect(text.style, titleLarge);
   });
 
-  testWidgets('Page should display text with message when Error',
-      (WidgetTester tester) async {
-    when(mockWatchlistBloc.state)
-        .thenReturn(const WatchlistError('Error message'));
-    when(mockWatchlistBloc.stream)
-        .thenAnswer((_) => Stream.value(const WatchlistError('Error message')));
+  testWidgets('Page should display text with message when Error', (
+    WidgetTester tester,
+  ) async {
+    when(mockWatchlistBloc.state).thenReturn(const BlocError('Error message'));
+    when(
+      mockWatchlistBloc.stream,
+    ).thenAnswer((_) => Stream.value(const BlocError('Error message')));
 
     await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
 

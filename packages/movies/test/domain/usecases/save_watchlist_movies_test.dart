@@ -17,8 +17,9 @@ void main() {
 
   test('should save movie to the repository', () async {
     // arrange
-    when(mockMovieRepository.saveWatchlistMovies(testMovieDetail))
-        .thenAnswer((_) async => const Right('Added to Watchlist'));
+    when(
+      mockMovieRepository.saveWatchlistMovies(testMovieDetail),
+    ).thenAnswer((_) async => const Right('Added to Watchlist'));
     // act
     final result = await usecase.execute(testMovieDetail);
     // assert

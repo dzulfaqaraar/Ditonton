@@ -1,3 +1,4 @@
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,28 +17,28 @@ void main() {
     mockAiringTodayTvSeriesBloc = MockAiringTodayTvSeriesBloc();
   });
 
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<AiringTodayTvSeriesBloc>(
           create: (context) => mockAiringTodayTvSeriesBloc,
         ),
       ],
-      child: MaterialApp(
-        home: body,
-      ),
+      child: MaterialApp(home: body),
     );
   }
 
-  testWidgets('Page should display center progress bar when loading',
-      (WidgetTester tester) async {
-    when(mockAiringTodayTvSeriesBloc.state)
-        .thenReturn(AiringTodayTvSeriesLoading());
-    when(mockAiringTodayTvSeriesBloc.stream)
-        .thenAnswer((_) => Stream.value(AiringTodayTvSeriesLoading()));
+  testWidgets('Page should display center progress bar when loading', (
+    WidgetTester tester,
+  ) async {
+    when(mockAiringTodayTvSeriesBloc.state).thenReturn(BlocLoading());
+    when(
+      mockAiringTodayTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
 
-    await tester
-        .pumpWidget(_makeTestableWidget(const AiringTodayTvSeriesPage()));
+    await tester.pumpWidget(
+      makeTestableWidget(const AiringTodayTvSeriesPage()),
+    );
 
     final progressBarFinder = find.byType(CircularProgressIndicator);
     final centerFinder = find.byType(Center);
@@ -46,29 +47,37 @@ void main() {
     expect(progressBarFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    when(mockAiringTodayTvSeriesBloc.state)
-        .thenReturn(AiringTodayTvSeriesHasData(testTvSeriesList));
-    when(mockAiringTodayTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(AiringTodayTvSeriesHasData(testTvSeriesList)));
+  testWidgets('Page should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockAiringTodayTvSeriesBloc.state,
+    ).thenReturn(BlocHasData(testTvSeriesList));
+    when(
+      mockAiringTodayTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testTvSeriesList)));
 
-    await tester
-        .pumpWidget(_makeTestableWidget(const AiringTodayTvSeriesPage()));
+    await tester.pumpWidget(
+      makeTestableWidget(const AiringTodayTvSeriesPage()),
+    );
 
     final listViewFinder = find.byType(ListView);
     expect(listViewFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display text with message when Error',
-      (WidgetTester tester) async {
-    when(mockAiringTodayTvSeriesBloc.state)
-        .thenReturn(const AiringTodayTvSeriesError('Error message'));
-    when(mockAiringTodayTvSeriesBloc.stream).thenAnswer(
-        (_) => Stream.value(const AiringTodayTvSeriesError('Error message')));
+  testWidgets('Page should display text with message when Error', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockAiringTodayTvSeriesBloc.state,
+    ).thenReturn(const BlocError('Error message'));
+    when(
+      mockAiringTodayTvSeriesBloc.stream,
+    ).thenAnswer((_) => Stream.value(const BlocError('Error message')));
 
-    await tester
-        .pumpWidget(_makeTestableWidget(const AiringTodayTvSeriesPage()));
+    await tester.pumpWidget(
+      makeTestableWidget(const AiringTodayTvSeriesPage()),
+    );
 
     final textFinder = find.byKey(const Key('error_message'));
     expect(textFinder, findsOneWidget);

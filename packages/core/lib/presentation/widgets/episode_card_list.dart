@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 class EpisodeCard extends StatefulWidget {
   final Episode episode;
 
-  const EpisodeCard({
-    Key? key,
-    required this.episode,
-  }) : super(key: key);
+  const EpisodeCard({super.key, required this.episode});
 
   @override
   State<EpisodeCard> createState() => _EpisodeCardState();
@@ -41,9 +38,8 @@ class _EpisodeCardState extends State<EpisodeCard> {
           child: CachedNetworkImage(
             imageUrl: '$baseImageUrl${widget.episode.stillPath}',
             width: 140,
-            placeholder: (context, url) => const Center(
-              child: CircularProgressIndicator(),
-            ),
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
             errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
@@ -55,13 +51,13 @@ class _EpisodeCardState extends State<EpisodeCard> {
               isExpanded
                   ? Text(
                       '${widget.episode.episodeNumber}. ${widget.episode.name}',
-                      style: titleMedium,
+                      style: headlineSmall,
                     )
                   : Text(
                       '${widget.episode.episodeNumber}. ${widget.episode.name}',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: titleMedium,
+                      style: headlineSmall,
                     ),
               const SizedBox(height: 8),
               if (!isExpanded)
@@ -83,24 +79,15 @@ class _EpisodeCardState extends State<EpisodeCard> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
-        Text(
-          'Overview',
-          style: titleMedium,
-        ),
+        Text('Overview', style: titleLarge),
         const SizedBox(height: 8),
-        Text(
-          widget.episode.overview ?? '-',
-          style: bodyMedium,
-        ),
+        Text(widget.episode.overview ?? '-', style: bodyMedium),
         const SizedBox(height: 8),
         if (widget.episode.guestStars.isNotEmpty)
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Guest Stars',
-                style: titleMedium,
-              ),
+              Text('Guest Stars', style: titleLarge),
               const SizedBox(height: 8),
               SizedBox(
                 height: 120,
@@ -114,8 +101,9 @@ class _EpisodeCardState extends State<EpisodeCard> {
                       child: Column(
                         children: [
                           ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(8)),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(8),
+                            ),
                             child: CachedNetworkImage(
                               imageUrl:
                                   '$baseImageUrl${guestStars.profilePath}',
@@ -173,7 +161,7 @@ class _EpisodeCardState extends State<EpisodeCard> {
             Icon(isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
             Text(
               isExpanded ? 'Close' : 'Expand',
-              style: titleSmall,
+              style: titleMedium,
               textAlign: TextAlign.center,
             ),
           ],

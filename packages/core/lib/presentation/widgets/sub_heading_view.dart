@@ -5,27 +5,20 @@ class SubHeadingView extends StatelessWidget {
   final String title;
   final Function() onTap;
 
-  const SubHeadingView({
-    Key? key,
-    required this.title,
-    required this.onTap,
-  }) : super(key: key);
+  const SubHeadingView({super.key, required this.title, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: titleMedium,
-        ),
+        Text(title, style: titleLarge),
         InkWell(
           onTap: onTap,
-          child: const Padding(
-            padding: EdgeInsets.all(8.0),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: Row(
-              children: [Text('See More'), Icon(Icons.arrow_forward_ios)],
+              children: const [Text('See More'), Icon(Icons.arrow_forward_ios)],
             ),
           ),
         ),

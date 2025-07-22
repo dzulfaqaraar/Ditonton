@@ -1,27 +1,24 @@
-import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/domain/usecase/get_tvseries.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tv_series/tv_series.dart';
 
 part 'popular_tv_series_event.dart';
-part 'popular_tv_series_state.dart';
 
-class PopularTvSeriesBloc
-    extends Bloc<PopularTvSeriesEvent, PopularTvSeriesState> {
-  final GetPopularTvSeries getPopularTvSeries;
+class PopularTvSeriesBloc extends Bloc<PopularTvSeriesEvent, BlocState> {
+  final GetTvSeries getTvSeries;
 
-  PopularTvSeriesBloc(this.getPopularTvSeries) : super(PopularTvSeriesEmpty()) {
+  PopularTvSeriesBloc(this.getTvSeries) : super(BlocEmpty()) {
     on<OnFetchingPopular>((event, emit) async {
-      emit(PopularTvSeriesLoading());
+      emit(BlocLoading());
 
-      final result = await getPopularTvSeries.execute();
+      final result = await getTvSeries.execute('/tv/popular');
 
       result.fold(
         (failure) {
-          emit(PopularTvSeriesError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(PopularTvSeriesHasData(data));
+          emit(BlocHasData(data));
         },
       );
     });

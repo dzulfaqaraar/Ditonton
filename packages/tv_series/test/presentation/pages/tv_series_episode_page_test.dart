@@ -1,4 +1,5 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,28 +18,32 @@ void main() {
     mockTvSeriesEpisodeBloc = MockTvSeriesEpisodeBloc();
   });
 
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MultiBlocProvider(
       providers: [
         BlocProvider<TvSeriesEpisodeBloc>(
           create: (context) => mockTvSeriesEpisodeBloc,
         ),
       ],
-      child: MaterialApp(
-        home: body,
-      ),
+      child: MaterialApp(home: body),
     );
   }
 
-  testWidgets('Page should display center progress bar when loading',
-      (WidgetTester tester) async {
-    when(mockTvSeriesEpisodeBloc.state).thenReturn(TvSeriesEpisodeLoading());
-    when(mockTvSeriesEpisodeBloc.stream)
-        .thenAnswer((_) => Stream.value(TvSeriesEpisodeLoading()));
+  testWidgets('Page should display center progress bar when loading', (
+    WidgetTester tester,
+  ) async {
+    when(mockTvSeriesEpisodeBloc.state).thenReturn(BlocLoading());
+    when(
+      mockTvSeriesEpisodeBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocLoading()));
 
-    await tester.pumpWidget(_makeTestableWidget(TvSeriesEpisodePage(
-      request: EpisodeRequest(title: "Title", id: 1, season: 1),
-    )));
+    await tester.pumpWidget(
+      makeTestableWidget(
+        TvSeriesEpisodePage(
+          request: EpisodeRequest(title: "Title", id: 1, season: 1),
+        ),
+      ),
+    );
 
     final progressBarFinder = find.byType(CircularProgressIndicator);
     final centerFinder = find.byType(Center);
@@ -47,31 +52,46 @@ void main() {
     expect(progressBarFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display ListView when data is loaded',
-      (WidgetTester tester) async {
-    when(mockTvSeriesEpisodeBloc.state)
-        .thenReturn(const TvSeriesEpisodeHasData(testTvSeriesEpisode));
+  testWidgets('Page should display ListView when data is loaded', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockTvSeriesEpisodeBloc.state,
+    ).thenReturn(const BlocHasData<TvSeriesEpisode>(testTvSeriesEpisode));
     when(mockTvSeriesEpisodeBloc.stream).thenAnswer(
-        (_) => Stream.value(const TvSeriesEpisodeHasData(testTvSeriesEpisode)));
+      (_) =>
+          Stream.value(const BlocHasData<TvSeriesEpisode>(testTvSeriesEpisode)),
+    );
 
-    await tester.pumpWidget(_makeTestableWidget(TvSeriesEpisodePage(
-      request: EpisodeRequest(title: "Title", id: 1, season: 1),
-    )));
+    await tester.pumpWidget(
+      makeTestableWidget(
+        TvSeriesEpisodePage(
+          request: EpisodeRequest(title: "Title", id: 1, season: 1),
+        ),
+      ),
+    );
 
     final listViewFinder = find.byType(ListView);
     expect(listViewFinder, findsOneWidget);
   });
 
-  testWidgets('Page should display text with message when Error',
-      (WidgetTester tester) async {
-    when(mockTvSeriesEpisodeBloc.state)
-        .thenReturn(const TvSeriesEpisodeError('Error message'));
-    when(mockTvSeriesEpisodeBloc.stream).thenAnswer(
-        (_) => Stream.value(const TvSeriesEpisodeError('Error message')));
+  testWidgets('Page should display text with message when Error', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockTvSeriesEpisodeBloc.state,
+    ).thenReturn(const BlocError('Error message'));
+    when(
+      mockTvSeriesEpisodeBloc.stream,
+    ).thenAnswer((_) => Stream.value(const BlocError('Error message')));
 
-    await tester.pumpWidget(_makeTestableWidget(TvSeriesEpisodePage(
-      request: EpisodeRequest(title: "Title", id: 1, season: 1),
-    )));
+    await tester.pumpWidget(
+      makeTestableWidget(
+        TvSeriesEpisodePage(
+          request: EpisodeRequest(title: "Title", id: 1, season: 1),
+        ),
+      ),
+    );
 
     final textFinder = find.byKey(const Key('error_message'));
     expect(textFinder, findsOneWidget);

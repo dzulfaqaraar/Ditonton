@@ -1,15 +1,6 @@
 part of 'tv_series_watchlist_bloc.dart';
 
-abstract class TvSeriesWatchlistState extends Equatable {
-  const TvSeriesWatchlistState();
-
-  @override
-  List<Object?> get props => [];
-}
-
-class TvSeriesWatchlistEmpty extends TvSeriesWatchlistState {}
-
-class TvSeriesWatchlistHasMessage extends TvSeriesWatchlistState {
+class TvSeriesWatchlistHasMessage extends BlocState {
   final bool? isAdded;
   final String? message;
 

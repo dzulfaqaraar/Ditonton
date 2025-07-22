@@ -16,18 +16,18 @@ class TvSeriesModel extends Equatable {
   final String? posterPath;
 
   factory TvSeriesModel.fromJson(Map<String, dynamic> json) => TvSeriesModel(
-        id: json["id"],
-        name: json["name"],
-        overview: json["overview"],
-        posterPath: json["poster_path"],
-      );
+    id: json["id"],
+    name: json["name"],
+    overview: json["overview"],
+    posterPath: json["poster_path"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "overview": overview,
-        "poster_path": posterPath,
-      };
+    "id": id,
+    "name": name,
+    "overview": overview,
+    "poster_path": posterPath,
+  };
 
   TvSeries toEntity() {
     return TvSeries(
@@ -40,11 +40,6 @@ class TvSeriesModel extends Equatable {
 
   @override
   List<Object?> get props {
-    return [
-      id,
-      name,
-      overview,
-      posterPath,
-    ];
+    return [id, name, overview, posterPath];
   }
 }

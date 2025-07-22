@@ -1,10 +1,10 @@
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
-import 'package:movies/movies.dart';
-import 'package:tv_series/tv_series.dart';
+import 'package:movies/presentation/pages/movie_page.dart';
+import 'package:tv_series/presentation/pages/tv_series_page.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -12,10 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _selectedPage = 0;
-  final List<Widget> _listPage = [
-    const MoviePage(),
-    const TvSeriesPage(),
-  ];
+  final List<Widget> _listPage = [const MoviePage(), const TvSeriesPage()];
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +88,7 @@ class _HomePageState extends State<HomePage> {
               );
             },
             icon: const Icon(Icons.search),
-          )
+          ),
         ],
       ),
       body: _listPage[_selectedPage],

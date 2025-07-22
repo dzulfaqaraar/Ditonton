@@ -6,16 +6,15 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../dummy_data/dummy_objects.dart';
 
 void main() {
-  Widget _makeTestableWidget(Widget body) {
+  Widget makeTestableWidget(Widget body) {
     return MaterialApp(
-      home: Scaffold(
-        body: body,
-      ),
+      home: Scaffold(body: body),
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case detailMovieRoute:
             return MaterialPageRoute(
-                builder: (_) => const Text('Movie Detail Page'));
+              builder: (_) => const Text('Movie Detail Page'),
+            );
         }
         return null;
       },
@@ -24,7 +23,9 @@ void main() {
 
   group('Movie Card', () {
     testWidgets('Page should display button', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(MovieCard(movie: testMovie)));
+      await tester.pumpWidget(
+        makeTestableWidget(const MovieCard(movie: testMovie)),
+      );
 
       final inkWellFinder = find.byKey(const Key('movie_card_item'));
       expect(inkWellFinder, findsOneWidget);
@@ -34,7 +35,9 @@ void main() {
     });
 
     testWidgets('Page should display image', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(MovieCard(movie: testMovie)));
+      await tester.pumpWidget(
+        makeTestableWidget(const MovieCard(movie: testMovie)),
+      );
 
       final imageClipFinder = find.byType(ClipRRect);
       expect(imageClipFinder, findsOneWidget);
@@ -47,7 +50,9 @@ void main() {
     });
 
     testWidgets('Button should open detail page', (WidgetTester tester) async {
-      await tester.pumpWidget(_makeTestableWidget(MovieCard(movie: testMovie)));
+      await tester.pumpWidget(
+        makeTestableWidget(const MovieCard(movie: testMovie)),
+      );
 
       final inkWellFinder = find.byKey(const Key('movie_card_item'));
       expect(inkWellFinder, findsOneWidget);

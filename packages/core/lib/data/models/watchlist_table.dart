@@ -20,12 +20,12 @@ class WatchlistTable extends Equatable {
   });
 
   factory WatchlistTable.fromEntityMovies(MovieDetail movie) => WatchlistTable(
-        id: movie.id,
-        title: movie.title,
-        posterPath: movie.posterPath,
-        overview: movie.overview,
-        isMovies: 1,
-      );
+    id: movie.id,
+    title: movie.title,
+    posterPath: movie.posterPath,
+    overview: movie.overview,
+    isMovies: 1,
+  );
 
   factory WatchlistTable.fromEntityTvSeries(TvSeriesDetail? tvSeries) =>
       WatchlistTable(
@@ -37,28 +37,28 @@ class WatchlistTable extends Equatable {
       );
 
   factory WatchlistTable.fromMap(Map<String, dynamic> map) => WatchlistTable(
-        id: map['id'],
-        title: map['title'],
-        posterPath: map['posterPath'],
-        overview: map['overview'],
-        isMovies: map['isMovies'],
-      );
+    id: map['id'],
+    title: map['title'],
+    posterPath: map['posterPath'],
+    overview: map['overview'],
+    isMovies: map['isMovies'],
+  );
 
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'title': title,
-        'posterPath': posterPath,
-        'overview': overview,
-        'isMovies': isMovies,
-      };
+    'id': id,
+    'title': title,
+    'posterPath': posterPath,
+    'overview': overview,
+    'isMovies': isMovies,
+  };
 
   Watchlist toEntity() => Watchlist(
-        id: id,
-        overview: overview ?? '',
-        posterPath: posterPath ?? '',
-        title: title ?? '',
-        isMovies: isMovies,
-      );
+    id: id,
+    overview: overview ?? '',
+    posterPath: posterPath ?? '',
+    title: title ?? '',
+    isMovies: isMovies,
+  );
 
   @override
   List<Object?> get props => [id, title, posterPath, overview, isMovies];

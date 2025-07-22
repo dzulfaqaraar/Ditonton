@@ -8,14 +8,13 @@ import '../../dummy_data/dummy_objects.dart';
 void main() {
   Widget makeTestableWidget(Widget body) {
     return MaterialApp(
-      home: Scaffold(
-        body: body,
-      ),
+      home: Scaffold(body: body),
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case episodeTvSeriesRoute:
             return MaterialPageRoute(
-                builder: (_) => const Text('TV Series Episode Page'));
+              builder: (_) => const Text('TV Series Episode Page'),
+            );
         }
         return null;
       },
@@ -24,10 +23,14 @@ void main() {
 
   group('Season Card', () {
     testWidgets('Page should display button', (WidgetTester tester) async {
-      await tester.pumpWidget(makeTestableWidget(SeasonCard(
-        tvSeries: testTvSeriesDetail,
-        season: testTvSeriesDetail.seasons!.first,
-      )));
+      await tester.pumpWidget(
+        makeTestableWidget(
+          SeasonCard(
+            tvSeries: testTvSeriesDetail,
+            season: testTvSeriesDetail.seasons!.first,
+          ),
+        ),
+      );
 
       final inkWellFinder = find.byKey(const Key('season_card_item'));
       expect(inkWellFinder, findsOneWidget);
@@ -37,10 +40,14 @@ void main() {
     });
 
     testWidgets('Page should display image', (WidgetTester tester) async {
-      await tester.pumpWidget(makeTestableWidget(SeasonCard(
-        tvSeries: testTvSeriesDetail,
-        season: testTvSeriesDetail.seasons!.first,
-      )));
+      await tester.pumpWidget(
+        makeTestableWidget(
+          SeasonCard(
+            tvSeries: testTvSeriesDetail,
+            season: testTvSeriesDetail.seasons!.first,
+          ),
+        ),
+      );
 
       final imageClipFinder = find.byType(ClipRRect);
       expect(imageClipFinder, findsOneWidget);
@@ -53,10 +60,14 @@ void main() {
     });
 
     testWidgets('Page should display content', (WidgetTester tester) async {
-      await tester.pumpWidget(makeTestableWidget(SeasonCard(
-        tvSeries: testTvSeriesDetail,
-        season: testTvSeriesDetail.seasons!.first,
-      )));
+      await tester.pumpWidget(
+        makeTestableWidget(
+          SeasonCard(
+            tvSeries: testTvSeriesDetail,
+            season: testTvSeriesDetail.seasons!.first,
+          ),
+        ),
+      );
 
       final textFinder = find.byType(Text);
 
@@ -64,7 +75,7 @@ void main() {
       expect(textNameFinder, findsOneWidget);
 
       Text textName = tester.widget(textNameFinder);
-      expect(textName.style, titleMedium);
+      expect(textName.style, titleLarge);
 
       final textAirDateFinder = textFinder.at(1);
       expect(textAirDateFinder, findsOneWidget);
@@ -76,8 +87,9 @@ void main() {
       expect(dividerFinder, findsNothing);
     });
 
-    testWidgets('Page should display air date and divider',
-        (WidgetTester tester) async {
+    testWidgets('Page should display air date and divider', (
+      WidgetTester tester,
+    ) async {
       final season = testTvSeriesDetail.seasons!.first;
       final newSeason = Season(
         id: season.id,
@@ -88,20 +100,25 @@ void main() {
         episodeCount: season.episodeCount,
         seasonNumber: season.seasonNumber,
       );
-      await tester.pumpWidget(makeTestableWidget(SeasonCard(
-        tvSeries: testTvSeriesDetail,
-        season: newSeason,
-      )));
+      await tester.pumpWidget(
+        makeTestableWidget(
+          SeasonCard(tvSeries: testTvSeriesDetail, season: newSeason),
+        ),
+      );
 
       final dividerFinder = find.byType(VerticalDivider);
       expect(dividerFinder, findsOneWidget);
     });
 
     testWidgets('Button should open detail page', (WidgetTester tester) async {
-      await tester.pumpWidget(makeTestableWidget(SeasonCard(
-        tvSeries: testTvSeriesDetail,
-        season: testTvSeriesDetail.seasons!.first,
-      )));
+      await tester.pumpWidget(
+        makeTestableWidget(
+          SeasonCard(
+            tvSeries: testTvSeriesDetail,
+            season: testTvSeriesDetail.seasons!.first,
+          ),
+        ),
+      );
 
       final inkWellFinder = find.byKey(const Key('season_card_item'));
       expect(inkWellFinder, findsOneWidget);

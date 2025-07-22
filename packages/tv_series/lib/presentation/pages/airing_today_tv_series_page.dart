@@ -1,10 +1,11 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_series/tv_series.dart';
 
 class AiringTodayTvSeriesPage extends StatefulWidget {
-  const AiringTodayTvSeriesPage({Key? key}) : super(key: key);
+  const AiringTodayTvSeriesPage({super.key});
 
   @override
   State<AiringTodayTvSeriesPage> createState() =>
@@ -15,26 +16,26 @@ class _AiringTodayTvSeriesPageState extends State<AiringTodayTvSeriesPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context
-        .read<AiringTodayTvSeriesBloc>()
-        .add(const OnFetchingAiringToday()));
+    Future.microtask(() {
+      if (mounted) {
+        context.read<AiringTodayTvSeriesBloc>().add(
+          const OnFetchingAiringToday(),
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Airing Today TV Series'),
-      ),
+      appBar: AppBar(title: const Text('Airing Today TV Series')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: BlocBuilder<AiringTodayTvSeriesBloc, AiringTodayTvSeriesState>(
+        child: BlocBuilder<AiringTodayTvSeriesBloc, BlocState>(
           builder: (context, state) {
-            if (state is AiringTodayTvSeriesLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is AiringTodayTvSeriesHasData) {
+            if (state is BlocLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is BlocHasData<List<TvSeries>>) {
               return ListView.builder(
                 itemBuilder: (context, index) {
                   final tvSeries = state.result[index];
@@ -42,7 +43,7 @@ class _AiringTodayTvSeriesPageState extends State<AiringTodayTvSeriesPage> {
                 },
                 itemCount: state.result.length,
               );
-            } else if (state is AiringTodayTvSeriesError) {
+            } else if (state is BlocError) {
               return Center(
                 key: const Key('error_message'),
                 child: Text(state.message),

@@ -15,8 +15,9 @@ void main() {
   group('fromJson', () {
     test('should return a valid model from JSON', () async {
       // arrange
-      final Map<String, dynamic> jsonMap =
-          json.decode(readJson('dummy_data/movie_detail.json'));
+      final Map<String, dynamic> jsonMap = json.decode(
+        readJson('dummy_data/movie_detail.json'),
+      );
       // act
       final result = MovieDetailResponse.fromJson(jsonMap);
       // assert
@@ -34,7 +35,7 @@ void main() {
         "backdrop_path": '/path.jpg',
         "budget": 100,
         "genres": [
-          {"id": 1, "name": "Action"}
+          {"id": 1, "name": "Action"},
         ],
         "homepage": 'https://google.com',
         "id": 1,

@@ -1,29 +1,28 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:search/search.dart';
 
 part 'search_event.dart';
-part 'search_state.dart';
 
-class SearchBloc extends Bloc<SearchEvent, SearchState> {
+class SearchBloc extends Bloc<SearchEvent, BlocState> {
   final SearchMovies _searchMovies;
   final SearchTvSeries _searchTvSeries;
 
-  SearchBloc(this._searchMovies, this._searchTvSeries) : super(SearchEmpty()) {
+  SearchBloc(this._searchMovies, this._searchTvSeries) : super(BlocEmpty()) {
     on<OnQueryChangedMovie>((event, emit) async {
       final query = event.query;
 
-      emit(SearchLoading());
+      emit(BlocLoading());
       final result = await _searchMovies.execute(query);
 
       result.fold(
         (failure) {
-          emit(SearchError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(SearchHasDataMovie(data));
+          emit(BlocHasData<List<Movie>>(data));
         },
       );
     }, transformer: debounce(const Duration(milliseconds: 500)));
@@ -31,15 +30,15 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     on<OnQueryChangedTvSeries>((event, emit) async {
       final query = event.query;
 
-      emit(SearchLoading());
+      emit(BlocLoading());
       final result = await _searchTvSeries.execute(query);
 
       result.fold(
         (failure) {
-          emit(SearchError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(SearchHasDataTvSeries(data));
+          emit(BlocHasData<List<TvSeries>>(data));
         },
       );
     }, transformer: debounce(const Duration(milliseconds: 500)));

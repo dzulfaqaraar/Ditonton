@@ -18,8 +18,9 @@ void main() {
   group('GetTvSeriesRecommendations Tests', () {
     test('should get list of tv series from the repository', () async {
       // arrange
-      when(mockMovieRepository.getTvSeriesRecommendations(testTvSeriesId))
-          .thenAnswer((_) async => Right(testTvSeriesList));
+      when(
+        mockMovieRepository.getTvSeriesRecommendations(testTvSeriesId),
+      ).thenAnswer((_) async => Right(testTvSeriesList));
       // act
       final result = await usecase.execute(testTvSeriesId);
       // assert

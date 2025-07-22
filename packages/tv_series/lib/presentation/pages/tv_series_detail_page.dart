@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -7,10 +8,7 @@ import 'package:tv_series/tv_series.dart';
 
 class TvSeriesDetailPage extends StatefulWidget {
   final int id;
-  const TvSeriesDetailPage({
-    Key? key,
-    required this.id,
-  }) : super(key: key);
+  const TvSeriesDetailPage({super.key, required this.id});
 
   @override
   State<TvSeriesDetailPage> createState() => _TvSeriesDetailPageState();
@@ -21,11 +19,15 @@ class _TvSeriesDetailPageState extends State<TvSeriesDetailPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<TvSeriesDetailBloc>().add(OnFetchingDetail(widget.id));
-      context
-          .read<TvSeriesRecommendationBloc>()
-          .add(OnFetchingRecommendation(widget.id));
-      context.read<TvSeriesWatchlistBloc>().add(OnLoadingWatchlist(widget.id));
+      if (mounted) {
+        context.read<TvSeriesDetailBloc>().add(OnFetchingDetail(widget.id));
+        context.read<TvSeriesRecommendationBloc>().add(
+          OnFetchingRecommendation(widget.id),
+        );
+        context.read<TvSeriesWatchlistBloc>().add(
+          OnLoadingWatchlist(widget.id),
+        );
+      }
     });
   }
 
@@ -35,42 +37,35 @@ class _TvSeriesDetailPageState extends State<TvSeriesDetailPage> {
     return Scaffold(
       body: BlocListener(
         bloc: watchlistBloc,
-        listener: (BuildContext context, TvSeriesWatchlistState state) {
+        listener: (BuildContext context, BlocState state) {
           if (state is TvSeriesWatchlistHasMessage) {
             if (state.message != null) {
               if (state.message == watchlistAddSuccessMessage ||
                   state.message == watchlistRemoveSuccessMessage) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(state.message!)),
-                );
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(state.message!)));
               } else {
                 showDialog(
                   context: context,
                   builder: (context) {
-                    return AlertDialog(
-                      content: Text(state.message!),
-                    );
+                    return AlertDialog(content: Text(state.message!));
                   },
                 );
               }
             }
           }
         },
-        child: BlocBuilder<TvSeriesDetailBloc, TvSeriesDetailState>(
+        child: BlocBuilder<TvSeriesDetailBloc, BlocState>(
           builder: (context, state) {
-            if (state is TvSeriesDetailLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is TvSeriesDetailHasData) {
+            if (state is BlocLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is BlocHasData<TvSeriesDetail>) {
               final tvSeries = state.result;
               return SafeArea(
-                child: DetailContent(
-                  id: widget.id,
-                  tvSeries: tvSeries,
-                ),
+                child: DetailContent(id: widget.id, tvSeries: tvSeries),
               );
-            } else if (state is TvSeriesDetailError) {
+            } else if (state is BlocError) {
               return Center(
                 key: const Key('error_message'),
                 child: Text(state.message),
@@ -89,11 +84,7 @@ class DetailContent extends StatefulWidget {
   final int id;
   final TvSeriesDetail tvSeries;
 
-  const DetailContent({
-    Key? key,
-    required this.id,
-    required this.tvSeries,
-  }) : super(key: key);
+  const DetailContent({super.key, required this.id, required this.tvSeries});
 
   @override
   State<DetailContent> createState() => _DetailContentState();
@@ -112,9 +103,8 @@ class _DetailContentState extends State<DetailContent> {
           imageUrl:
               'https://image.tmdb.org/t/p/w500${widget.tvSeries.posterPath}',
           width: screenWidth,
-          placeholder: (context, url) => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          placeholder: (context, url) =>
+              const Center(child: CircularProgressIndicator()),
           errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
         Container(
@@ -126,11 +116,7 @@ class _DetailContentState extends State<DetailContent> {
                   color: kRichBlack,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  top: 16,
-                  right: 16,
-                ),
+                padding: const EdgeInsets.only(left: 16, top: 16, right: 16),
                 child: Stack(
                   children: [
                     Container(
@@ -144,45 +130,41 @@ class _DetailContentState extends State<DetailContent> {
                               children: [
                                 Text(
                                   widget.tvSeries.name ?? '',
-                                  style: titleLarge,
+                                  style: headlineSmall,
                                 ),
                                 _watchlistView(),
-                                Text(
-                                  _showGenres(widget.tvSeries.genres ?? []),
-                                ),
+                                Text(_showGenres(widget.tvSeries.genres ?? [])),
                                 if (widget
-                                        .tvSeries.episodeRunTime?.isNotEmpty ??
+                                        .tvSeries
+                                        .episodeRunTime
+                                        ?.isNotEmpty ??
                                     false)
                                   Text(
                                     _showDuration(
-                                        widget.tvSeries.episodeRunTime?.first ??
-                                            0),
+                                      widget.tvSeries.episodeRunTime?.first ??
+                                          0,
+                                    ),
                                   ),
                                 Row(
                                   children: [
                                     RatingBarIndicator(
                                       rating:
                                           (widget.tvSeries.voteAverage ?? 0) /
-                                              2,
+                                          2,
                                       itemCount: 5,
                                       itemBuilder: (context, index) =>
                                           const Icon(
-                                        Icons.star,
-                                        color: kMikadoYellow,
-                                      ),
+                                            Icons.star,
+                                            color: kMikadoYellow,
+                                          ),
                                       itemSize: 24,
                                     ),
-                                    Text('${widget.tvSeries.voteAverage}')
+                                    Text('${widget.tvSeries.voteAverage}'),
                                   ],
                                 ),
                                 const SizedBox(height: 16),
-                                Text(
-                                  'Overview',
-                                  style: titleMedium,
-                                ),
-                                Text(
-                                  widget.tvSeries.overview ?? '',
-                                ),
+                                Text('Overview', style: titleLarge),
+                                Text(widget.tvSeries.overview ?? ''),
                                 const SizedBox(height: 16),
                               ],
                             ),
@@ -220,63 +202,57 @@ class _DetailContentState extends State<DetailContent> {
               },
             ),
           ),
-        )
+        ),
       ],
     );
   }
 
   Widget _watchlistView() {
-    return BlocBuilder<TvSeriesWatchlistBloc, TvSeriesWatchlistState>(
-        builder: (context, state) {
-      if (state is TvSeriesWatchlistEmpty) {
-        return const ElevatedButton(
-          onPressed: null,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.add),
-              Text('Watchlist'),
-            ],
-          ),
-        );
-      } else if (state is TvSeriesWatchlistHasMessage) {
-        final isAddedWatchlist = state.isAdded;
+    return BlocBuilder<TvSeriesWatchlistBloc, BlocState>(
+      builder: (context, state) {
+        if (state is BlocEmpty) {
+          return ElevatedButton(
+            onPressed: null,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: const [Icon(Icons.add), Text('Watchlist')],
+            ),
+          );
+        } else if (state is TvSeriesWatchlistHasMessage) {
+          final isAddedWatchlist = state.isAdded;
 
-        return ElevatedButton(
-          onPressed: () async {
-            if (isAddedWatchlist == false) {
-              context
-                  .read<TvSeriesWatchlistBloc>()
-                  .add(OnAddingWatchlist(widget.tvSeries));
-            } else if (isAddedWatchlist == true) {
-              context
-                  .read<TvSeriesWatchlistBloc>()
-                  .add(OnRemovingWatchlist(widget.tvSeries));
-            }
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              isAddedWatchlist == true
-                  ? const Icon(Icons.check)
-                  : const Icon(Icons.add),
-              const Text(
-                'Watchlist',
-                key: Key('watchlist_text'),
-              ),
-            ],
-          ),
-        );
-      } else {
-        return const SizedBox.shrink();
-      }
-    });
+          return ElevatedButton(
+            onPressed: () async {
+              if (isAddedWatchlist == false) {
+                context.read<TvSeriesWatchlistBloc>().add(
+                  OnAddingWatchlist(widget.tvSeries),
+                );
+              } else if (isAddedWatchlist == true) {
+                context.read<TvSeriesWatchlistBloc>().add(
+                  OnRemovingWatchlist(widget.tvSeries),
+                );
+              }
+            },
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                isAddedWatchlist == true
+                    ? const Icon(Icons.check)
+                    : const Icon(Icons.add),
+                const Text('Watchlist', key: Key('watchlist_text')),
+              ],
+            ),
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
+    );
   }
 
   Widget _seasonHeaderView() {
-    return BlocBuilder<TvSeriesDetailBloc, TvSeriesDetailState>(
+    return BlocBuilder<TvSeriesDetailBloc, BlocState>(
       builder: (context, state) {
-        final detailBloc = context.read<TvSeriesDetailBloc>();
         final seasonsLength = widget.tvSeries.seasons?.length ?? 0;
 
         return SliverToBoxAdapter(
@@ -288,7 +264,7 @@ class _DetailContentState extends State<DetailContent> {
                   isAllSeasonShowing || seasonsLength == 1
                       ? 'All Season'
                       : 'Last Season',
-                  style: titleMedium,
+                  style: titleLarge,
                 ),
               if (seasonsLength > 1)
                 InkWell(
@@ -302,9 +278,7 @@ class _DetailContentState extends State<DetailContent> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Text(
-                          isAllSeasonShowing ? 'Hide Other' : 'View All',
-                        ),
+                        Text(isAllSeasonShowing ? 'Hide Other' : 'View All'),
                       ],
                     ),
                   ),
@@ -317,28 +291,21 @@ class _DetailContentState extends State<DetailContent> {
   }
 
   Widget _seasonListView(TvSeriesDetail tvSeries) {
-    return BlocBuilder<TvSeriesDetailBloc, TvSeriesDetailState>(
+    return BlocBuilder<TvSeriesDetailBloc, BlocState>(
       builder: (context, state) {
         if (tvSeries.seasons != null && tvSeries.seasons!.isNotEmpty) {
-          final listSeason =
-              isAllSeasonShowing ? tvSeries.seasons! : [tvSeries.seasons!.last];
+          final listSeason = isAllSeasonShowing
+              ? tvSeries.seasons!
+              : [tvSeries.seasons!.last];
 
           return SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (context, index) {
-                final season = listSeason[index];
-                return SeasonCard(
-                  tvSeries: tvSeries,
-                  season: season,
-                );
-              },
-              childCount: listSeason.length,
-            ),
+            delegate: SliverChildBuilderDelegate((context, index) {
+              final season = listSeason[index];
+              return SeasonCard(tvSeries: tvSeries, season: season);
+            }, childCount: listSeason.length),
           );
         } else {
-          return const SliverToBoxAdapter(
-            child: SizedBox.shrink(),
-          );
+          return const SliverToBoxAdapter(child: SizedBox.shrink());
         }
       },
     );
@@ -349,19 +316,16 @@ class _DetailContentState extends State<DetailContent> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Recommendations',
-            style: titleMedium,
-          ),
-          BlocBuilder<TvSeriesRecommendationBloc, TvSeriesRecommendationState>(
+          Text('Recommendations', style: titleLarge),
+          BlocBuilder<TvSeriesRecommendationBloc, BlocState>(
             builder: (context, state) {
-              if (state is TvSeriesRecommendationLoading) {
+              if (state is BlocLoading) {
                 return const Center(
                   child: CircularProgressIndicator(
                     key: Key('recommendations_progress'),
                   ),
                 );
-              } else if (state is TvSeriesRecommendationHasData) {
+              } else if (state is BlocHasData<List<TvSeries>>) {
                 return SizedBox(
                   height: 150,
                   child: ListView.builder(
@@ -399,7 +363,7 @@ class _DetailContentState extends State<DetailContent> {
                     itemCount: state.result.length,
                   ),
                 );
-              } else if (state is TvSeriesRecommendationError) {
+              } else if (state is BlocError) {
                 return Center(
                   key: const Key('error_message'),
                   child: Text(state.message),

@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -16,43 +17,43 @@ void main() {
 
   setUp(() {
     mockGetTvSeriesRecommendations = MockGetTvSeriesRecommendations();
-    tvSeriesRecommendationBloc =
-        TvSeriesRecommendationBloc(mockGetTvSeriesRecommendations);
+    tvSeriesRecommendationBloc = TvSeriesRecommendationBloc(
+      mockGetTvSeriesRecommendations,
+    );
   });
 
   test('initial state should be empty', () {
-    expect(tvSeriesRecommendationBloc.state, TvSeriesRecommendationEmpty());
+    expect(tvSeriesRecommendationBloc.state, BlocEmpty());
   });
 
-  blocTest<TvSeriesRecommendationBloc, TvSeriesRecommendationState>(
+  blocTest<TvSeriesRecommendationBloc, BlocState>(
     'Should emit [Loading, HasData] when data Recommendation is gotten successfully',
     build: () {
-      when(mockGetTvSeriesRecommendations.execute(1))
-          .thenAnswer((_) async => Right(testTvSeriesList));
+      when(
+        mockGetTvSeriesRecommendations.execute(1),
+      ).thenAnswer((_) async => Right(testTvSeriesList));
       return tvSeriesRecommendationBloc;
     },
     act: (bloc) => bloc.add(const OnFetchingRecommendation(1)),
     expect: () => [
-      TvSeriesRecommendationLoading(),
-      TvSeriesRecommendationHasData(testTvSeriesList),
+      BlocLoading(),
+      BlocHasData<List<TvSeries>>(testTvSeriesList),
     ],
     verify: (bloc) {
       verify(mockGetTvSeriesRecommendations.execute(1));
     },
   );
 
-  blocTest<TvSeriesRecommendationBloc, TvSeriesRecommendationState>(
+  blocTest<TvSeriesRecommendationBloc, BlocState>(
     'Should emit [Loading, Error] when data Recommendation is unsuccessful',
     build: () {
-      when(mockGetTvSeriesRecommendations.execute(1))
-          .thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
+      when(
+        mockGetTvSeriesRecommendations.execute(1),
+      ).thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
       return tvSeriesRecommendationBloc;
     },
     act: (bloc) => bloc.add(const OnFetchingRecommendation(1)),
-    expect: () => [
-      TvSeriesRecommendationLoading(),
-      const TvSeriesRecommendationError('Server Failure'),
-    ],
+    expect: () => [BlocLoading(), const BlocError('Server Failure')],
     verify: (bloc) {
       verify(mockGetTvSeriesRecommendations.execute(1));
     },

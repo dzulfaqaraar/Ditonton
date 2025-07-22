@@ -5,10 +5,7 @@ import 'package:flutter/material.dart';
 class MovieCard extends StatelessWidget {
   final Movie movie;
 
-  const MovieCard({
-    Key? key,
-    required this.movie,
-  }) : super(key: key);
+  const MovieCard({super.key, required this.movie});
 
   @override
   Widget build(BuildContext context) {
@@ -17,11 +14,7 @@ class MovieCard extends StatelessWidget {
       child: InkWell(
         key: const Key('movie_card_item'),
         onTap: () {
-          Navigator.pushNamed(
-            context,
-            detailMovieRoute,
-            arguments: movie.id,
-          );
+          Navigator.pushNamed(context, detailMovieRoute, arguments: movie.id);
         },
         child: Stack(
           alignment: Alignment.bottomLeft,
@@ -43,7 +36,7 @@ class MovieCard extends StatelessWidget {
                             movie.title ?? '-',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: titleMedium,
+                            style: titleLarge,
                           ),
                           const SizedBox(height: 16),
                           Text(
@@ -59,18 +52,14 @@ class MovieCard extends StatelessWidget {
               ),
             ),
             Container(
-              margin: const EdgeInsets.only(
-                left: 16,
-                bottom: 16,
-              ),
+              margin: const EdgeInsets.only(left: 16, bottom: 16),
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
                 child: CachedNetworkImage(
                   imageUrl: '$baseImageUrl${movie.posterPath}',
                   width: 80,
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),

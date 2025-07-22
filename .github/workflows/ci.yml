@@ -1,0 +1,160 @@
+name: Flutter CI/CD
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.7'
+        channel: 'stable'
+
+    - name: Create .env
+      run: |
+        {
+          echo "BASE_URL=https://api.themoviedb.org/3"
+          echo "API_KEY=${{ secrets.API_KEY }}"
+        } >> .env
+
+    - name: Create certificates.pem
+      run: |
+        mkdir -p ./certificates
+        {
+          echo "${{ secrets.CERT_PEM }}"
+        } >> ./certificates/certificates.pem
+
+    - name: Get dependencies
+      run: |
+        flutter pub get
+        cd packages/core && flutter pub get && flutter pub run build_runner build
+        cd ../movies && flutter pub get && flutter pub run build_runner build
+        cd ../tv_series && flutter pub get && flutter pub run build_runner build
+        cd ../search && flutter pub get && flutter pub run build_runner build
+        cd ../watchlist && flutter pub get && flutter pub run build_runner build
+        cd ../about && flutter pub get
+        cd ../..
+
+    - name: Run static analysis
+      run: flutter analyze
+
+    - name: Format check
+      run: dart format --set-exit-if-changed .
+
+    - name: Run unit tests
+      run: |
+        chmod +x ./test.sh
+        ./test.sh
+
+    # - name: Upload coverage reports to Codecov
+    #   uses: codecov/codecov-action@v3
+    #   with:
+    #     file: coverage/lcov.info
+
+    # - name: Upload coverage reports to Codecov
+    #   uses: codecov/codecov-action@v5
+    #   with:
+    #     token: ${{ secrets.CODECOV_TOKEN }}
+
+  build_android:
+    name: Build Android
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.7'
+        channel: 'stable'
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'zulu'
+        java-version: '17'
+
+    - name: Create local.properties
+      run: |
+        echo "flutter.compileSdk=34" >> android/local.properties
+        echo "flutter.minSdk=21" >> android/local.properties
+        echo "flutter.targetSdk=34" >> android/local.properties
+        echo "flutter.ndkVersion=27.0.12077973" >> android/local.properties
+
+    - name: Create .env
+      run: |
+        {
+          echo "BASE_URL=https://api.themoviedb.org/3"
+          echo "API_KEY=${{ secrets.API_KEY }}"
+        } >> .env
+
+    - name: Create certificates.pem
+      run: |
+        mkdir -p ./certificates
+        {
+          echo "${{ secrets.CERT_PEM }}"
+        } >> ./certificates/certificates.pem
+
+    - name: Build APK
+      run: flutter build apk --release
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-apk
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+  build_ios:
+    name: Build iOS
+    runs-on: macos-latest
+    needs: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.32.7'
+        channel: 'stable'
+
+    - name: Get dependencies
+      run: flutter pub get
+
+    - name: Create .env
+      run: |
+        {
+          echo "BASE_URL=https://api.themoviedb.org/3"
+          echo "API_KEY=${{ secrets.API_KEY }}"
+        } >> .env
+
+    - name: Create certificates.pem
+      run: |
+        mkdir -p ./certificates
+        {
+          echo "${{ secrets.CERT_PEM }}"
+        } >> ./certificates/certificates.pem
+
+    - name: Build iOS (no codesign)
+      run: flutter build ios --release --no-codesign
+
+    - name: Upload iOS build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ios-build
+        path: build/ios/iphoneos/

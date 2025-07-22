@@ -31,11 +31,13 @@ void main() {
   group('fromJson', () {
     test('should return a valid model from JSON', () async {
       // arrange
-      final Map<String, dynamic> jsonMap =
-          json.decode(readJson('dummy_data/tv_series_airing_today.json'));
+      final Map<String, dynamic> jsonMap = json.decode(
+        readJson('dummy_data/tv_series_airing_today.json'),
+      );
       // act
-      final result = List<TvSeriesModel>.from((jsonMap["results"] as List)
-          .map((x) => TvSeriesModel.fromJson(x))).first;
+      final result = List<TvSeriesModel>.from(
+        (jsonMap["results"] as List).map((x) => TvSeriesModel.fromJson(x)),
+      ).first;
       // assert
       expect(result, tvSeriesModel);
     });

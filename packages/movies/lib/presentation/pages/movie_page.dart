@@ -1,11 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies/movies.dart';
 
 class MoviePage extends StatefulWidget {
-  const MoviePage({Key? key}) : super(key: key);
+  const MoviePage({super.key});
 
   @override
   State<MoviePage> createState() => _MoviePageState();
@@ -16,9 +17,11 @@ class _MoviePageState extends State<MoviePage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      context.read<MovieListBloc>().add(const OnFetchingList());
-      context.read<PopularMoviesBloc>().add(const OnFetchingPopular());
-      context.read<TopRatedMoviesBloc>().add(const OnFetchingTopRated());
+      if (mounted) {
+        context.read<MovieListBloc>().add(const OnFetchingList());
+        context.read<PopularMoviesBloc>().add(const OnFetchingPopular());
+        context.read<TopRatedMoviesBloc>().add(const OnFetchingTopRated());
+      }
     });
   }
 
@@ -30,55 +33,51 @@ class _MoviePageState extends State<MoviePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Now Playing',
-              style: titleMedium,
+            Text('Now Playing', style: titleLarge),
+            BlocBuilder<MovieListBloc, BlocState>(
+              builder: (context, state) {
+                if (state is BlocLoading) {
+                  return const Center(
+                    key: Key('progress_now_playing'),
+                    child: CircularProgressIndicator(),
+                  );
+                } else if (state is BlocHasData<List<Movie>>) {
+                  return MovieList(movies: state.result);
+                } else {
+                  return const Text('Failed');
+                }
+              },
             ),
-            BlocBuilder<MovieListBloc, MovieListState>(
-                builder: (context, state) {
-              if (state is MovieListLoading) {
-                return const Center(
-                  key: Key('progress_now_playing'),
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is MovieListHasData) {
-                return MovieList(movies: state.result);
-              } else {
-                return const Text('Failed');
-              }
-            }),
             SubHeadingView(
               title: 'Popular',
               onTap: () => Navigator.pushNamed(context, popularMovieRoute),
             ),
-            BlocBuilder<PopularMoviesBloc, PopularMoviesState>(
-                builder: (context, state) {
-              if (state is PopularMoviesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is PopularMoviesHasData) {
-                return MovieList(movies: state.result);
-              } else {
-                return const Text('Failed');
-              }
-            }),
+            BlocBuilder<PopularMoviesBloc, BlocState>(
+              builder: (context, state) {
+                if (state is BlocLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BlocHasData<List<Movie>>) {
+                  return MovieList(movies: state.result);
+                } else {
+                  return const Text('Failed');
+                }
+              },
+            ),
             SubHeadingView(
               title: 'Top Rated',
               onTap: () => Navigator.pushNamed(context, topRatedMovieRoute),
             ),
-            BlocBuilder<TopRatedMoviesBloc, TopRatedMoviesState>(
-                builder: (context, state) {
-              if (state is TopRatedMoviesLoading) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else if (state is TopRatedMoviesHasData) {
-                return MovieList(movies: state.result);
-              } else {
-                return const Text('Failed');
-              }
-            }),
+            BlocBuilder<TopRatedMoviesBloc, BlocState>(
+              builder: (context, state) {
+                if (state is BlocLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is BlocHasData<List<Movie>>) {
+                  return MovieList(movies: state.result);
+                } else {
+                  return const Text('Failed');
+                }
+              },
+            ),
           ],
         ),
       ),
@@ -89,10 +88,7 @@ class _MoviePageState extends State<MoviePage> {
 class MovieList extends StatelessWidget {
   final List<Movie> movies;
 
-  const MovieList({
-    Key? key,
-    required this.movies,
-  }) : super(key: key);
+  const MovieList({super.key, required this.movies});
 
   @override
   Widget build(BuildContext context) {
@@ -117,9 +113,8 @@ class MovieList extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(16)),
                 child: CachedNetworkImage(
                   imageUrl: '$baseImageUrl${movie.posterPath}',
-                  placeholder: (context, url) => const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  placeholder: (context, url) =>
+                      const Center(child: CircularProgressIndicator()),
                   errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),

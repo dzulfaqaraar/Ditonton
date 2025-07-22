@@ -1,28 +1,25 @@
-import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies/domain/usecases/get_movie_recommendations.dart';
 
 part 'movie_recommendation_event.dart';
-part 'movie_recommendation_state.dart';
 
 class MovieRecommendationBloc
-    extends Bloc<MovieRecommendationEvent, MovieRecommendationState> {
+    extends Bloc<MovieRecommendationEvent, BlocState> {
   final GetMovieRecommendations getMovieRecommendations;
 
-  MovieRecommendationBloc(this.getMovieRecommendations)
-      : super(MovieRecommendationEmpty()) {
+  MovieRecommendationBloc(this.getMovieRecommendations) : super(BlocEmpty()) {
     on<OnFetchingRecommendation>((event, emit) async {
-      emit(MovieRecommendationLoading());
+      emit(BlocLoading());
 
       final recommendation = await getMovieRecommendations.execute(event.id);
 
       recommendation.fold(
         (failure) {
-          emit(MovieRecommendationError(failure.message));
+          emit(BlocError(failure.message));
         },
         (movies) {
-          emit(MovieRecommendationHasData(movies));
+          emit(BlocHasData(movies));
         },
       );
     });

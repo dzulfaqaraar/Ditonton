@@ -29,19 +29,20 @@ class TvSeriesEpisodeResponse extends Equatable {
         posterPath: json["poster_path"],
         airDate: json["air_date"],
         episodes: List<EpisodeResponse>.from(
-            json["episodes"].map((x) => EpisodeResponse.fromJson(x))),
+          json["episodes"].map((x) => EpisodeResponse.fromJson(x)),
+        ),
         seasonNumber: json["season_number"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "overview": overview,
-        "poster_path": posterPath,
-        "air_date": airDate,
-        "episodes": episodes?.map((x) => x.toJson()).toList(),
-        "season_number": seasonNumber,
-      };
+    "id": id,
+    "name": name,
+    "overview": overview,
+    "poster_path": posterPath,
+    "air_date": airDate,
+    "episodes": episodes?.map((x) => x.toJson()).toList(),
+    "season_number": seasonNumber,
+  };
 
   TvSeriesEpisode toEntity() {
     return TvSeriesEpisode(
@@ -57,15 +58,7 @@ class TvSeriesEpisodeResponse extends Equatable {
 
   @override
   List<Object?> get props {
-    return [
-      id,
-      name,
-      overview,
-      posterPath,
-      airDate,
-      episodes,
-      seasonNumber,
-    ];
+    return [id, name, overview, posterPath, airDate, episodes, seasonNumber];
   }
 }
 
@@ -94,17 +87,18 @@ class EpisodeResponse extends Equatable {
         episodeNumber: json["episode_number"],
         stillPath: json["still_path"],
         guestStars: List<CrewResponse>.from(
-            json["guest_stars"].map((x) => CrewResponse.fromJson(x))),
+          json["guest_stars"].map((x) => CrewResponse.fromJson(x)),
+        ),
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "overview": overview,
-        "episode_number": episodeNumber,
-        "still_path": stillPath,
-        "guest_stars": List<dynamic>.from(guestStars.map((x) => x.toJson())),
-      };
+    "id": id,
+    "name": name,
+    "overview": overview,
+    "episode_number": episodeNumber,
+    "still_path": stillPath,
+    "guest_stars": List<dynamic>.from(guestStars.map((x) => x.toJson())),
+  };
 
   Episode toEntity() {
     return Episode(
@@ -119,14 +113,7 @@ class EpisodeResponse extends Equatable {
 
   @override
   List<Object?> get props {
-    return [
-      id,
-      name,
-      overview,
-      episodeNumber,
-      stillPath,
-      guestStars,
-    ];
+    return [id, name, overview, episodeNumber, stillPath, guestStars];
   }
 }
 
@@ -144,18 +131,18 @@ class CrewResponse extends Equatable {
   final String? profilePath;
 
   factory CrewResponse.fromJson(Map<String, dynamic> json) => CrewResponse(
-        id: json["id"],
-        name: json["name"],
-        character: json["character"],
-        profilePath: json["profile_path"],
-      );
+    id: json["id"],
+    name: json["name"],
+    character: json["character"],
+    profilePath: json["profile_path"],
+  );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "name": name,
-        "character": character,
-        "profile_path": profilePath,
-      };
+    "id": id,
+    "name": name,
+    "character": character,
+    "profile_path": profilePath,
+  };
 
   Crew toEntity() {
     return Crew(
@@ -167,10 +154,5 @@ class CrewResponse extends Equatable {
   }
 
   @override
-  List<Object?> get props => [
-        id,
-        character,
-        name,
-        profilePath,
-      ];
+  List<Object?> get props => [id, character, name, profilePath];
 }

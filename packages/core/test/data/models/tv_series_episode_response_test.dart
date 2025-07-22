@@ -15,8 +15,9 @@ void main() {
   group('fromJson', () {
     test('should return a valid model from JSON', () async {
       // arrange
-      final Map<String, dynamic> jsonMap =
-          json.decode(readJson('dummy_data/tv_series_episode.json'));
+      final Map<String, dynamic> jsonMap = json.decode(
+        readJson('dummy_data/tv_series_episode.json'),
+      );
       // act
       final result = TvSeriesEpisodeResponse.fromJson(jsonMap);
       // assert
@@ -48,9 +49,9 @@ void main() {
                 "id": 1005920,
                 "name": "Irene Keng",
                 "character": "Elle McLean",
-                "profile_path": "/xElpxbxNFNtBdeccxSqbnAeaul2.jpg"
-              }
-            ]
+                "profile_path": "/xElpxbxNFNtBdeccxSqbnAeaul2.jpg",
+              },
+            ],
           },
           {
             "id": 2501960,
@@ -64,12 +65,12 @@ void main() {
                 "id": 1005920,
                 "name": "Irene Keng",
                 "character": "Elle McLean",
-                "profile_path": "/xElpxbxNFNtBdeccxSqbnAeaul2.jpg"
-              }
-            ]
-          }
+                "profile_path": "/xElpxbxNFNtBdeccxSqbnAeaul2.jpg",
+              },
+            ],
+          },
         ],
-        "season_number": 1
+        "season_number": 1,
       };
       expect(result, expectedJsonMap);
     });

@@ -3,9 +3,5 @@ class EpisodeRequest {
   final int id;
   final int season;
 
-  EpisodeRequest({
-    required this.title,
-    required this.id,
-    required this.season,
-  });
+  EpisodeRequest({required this.title, required this.id, required this.season});
 }

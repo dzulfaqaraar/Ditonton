@@ -1,28 +1,27 @@
 import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_series/tv_series.dart';
 
 part 'tv_series_recommendation_event.dart';
-part 'tv_series_recommendation_state.dart';
 
 class TvSeriesRecommendationBloc
-    extends Bloc<TvSeriesRecommendationEvent, TvSeriesRecommendationState> {
+    extends Bloc<TvSeriesRecommendationEvent, BlocState> {
   final GetTvSeriesRecommendations getTvSeriesRecommendations;
 
   TvSeriesRecommendationBloc(this.getTvSeriesRecommendations)
-      : super(TvSeriesRecommendationEmpty()) {
+    : super(BlocEmpty()) {
     on<OnFetchingRecommendation>((event, emit) async {
-      emit(TvSeriesRecommendationLoading());
+      emit(BlocLoading());
 
       final recommendation = await getTvSeriesRecommendations.execute(event.id);
 
       recommendation.fold(
         (failure) {
-          emit(TvSeriesRecommendationError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(TvSeriesRecommendationHasData(data));
+          emit(BlocHasData<List<TvSeries>>(data));
         },
       );
     });

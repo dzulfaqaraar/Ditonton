@@ -1,25 +1,23 @@
-import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/domain/usecase/get_movies.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movies/domain/usecases/get_now_playing_movies.dart';
 
 part 'movie_list_event.dart';
-part 'movie_list_state.dart';
 
-class MovieListBloc extends Bloc<MovieListEvent, MovieListState> {
-  final GetNowPlayingMovies getNowPlayingMovies;
+class MovieListBloc extends Bloc<MovieListEvent, BlocState> {
+  final GetMovies getMovies;
 
-  MovieListBloc(this.getNowPlayingMovies) : super(MovieListEmpty()) {
+  MovieListBloc(this.getMovies) : super(BlocEmpty()) {
     on<OnFetchingList>((event, emit) async {
-      emit(MovieListLoading());
+      emit(BlocLoading());
 
-      final result = await getNowPlayingMovies.execute();
+      final result = await getMovies.execute('/movie/now_playing');
       result.fold(
         (failure) {
-          emit(MovieListError(failure.message));
+          emit(BlocError(failure.message));
         },
         (moviesData) {
-          emit(MovieListHasData(moviesData));
+          emit(BlocHasData(moviesData));
         },
       );
     });

@@ -1,5 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -20,38 +21,34 @@ void main() {
   });
 
   test('initial state should be empty', () {
-    expect(movieDetailBloc.state, MovieDetailEmpty());
+    expect(movieDetailBloc.state, BlocEmpty());
   });
 
-  blocTest<MovieDetailBloc, MovieDetailState>(
+  blocTest<MovieDetailBloc, BlocState>(
     'Should emit [Loading, HasData] when data Movie Detail is gotten successfully',
     build: () {
-      when(mockGetMovieDetail.execute(1))
-          .thenAnswer((_) async => const Right(testMovieDetail));
+      when(
+        mockGetMovieDetail.execute(1),
+      ).thenAnswer((_) async => const Right(testMovieDetail));
       return movieDetailBloc;
     },
     act: (bloc) => bloc.add(const OnFetchingDetail(1)),
-    expect: () => [
-      MovieDetailLoading(),
-      const MovieDetailHasData(testMovieDetail),
-    ],
+    expect: () => [BlocLoading(), const BlocHasData(testMovieDetail)],
     verify: (bloc) {
       verify(mockGetMovieDetail.execute(1));
     },
   );
 
-  blocTest<MovieDetailBloc, MovieDetailState>(
+  blocTest<MovieDetailBloc, BlocState>(
     'Should emit [Loading, Error] when data Movie Detail is unsuccessful',
     build: () {
-      when(mockGetMovieDetail.execute(1))
-          .thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
+      when(
+        mockGetMovieDetail.execute(1),
+      ).thenAnswer((_) async => const Left(ServerFailure('Server Failure')));
       return movieDetailBloc;
     },
     act: (bloc) => bloc.add(const OnFetchingDetail(1)),
-    expect: () => [
-      MovieDetailLoading(),
-      const MovieDetailError('Server Failure'),
-    ],
+    expect: () => [BlocLoading(), const BlocError('Server Failure')],
     verify: (bloc) {
       verify(mockGetMovieDetail.execute(1));
     },

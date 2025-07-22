@@ -1,5 +1,3 @@
-library watchlist;
-
 export 'domain/usecases/get_watchlist_data.dart';
 export 'domain/usecases/get_watchlist_status.dart';
 

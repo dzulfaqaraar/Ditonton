@@ -9,7 +9,13 @@ import 'package:ditonton/main.dart' as app;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  setUp(() {
+  setUpAll(() async {
+    // Reset GetIt to avoid duplicate registration between tests
+    GetIt.I.reset();
+  });
+
+  tearDown(() async {
+    // Reset GetIt after each test to prevent state pollution
     GetIt.I.reset();
   });
 
@@ -25,7 +31,9 @@ void main() {
       final buttonWatchlistFinder = find.byType(ElevatedButton);
 
       final iconWatchlistFinder = find.descendant(
-          of: buttonWatchlistFinder, matching: find.byType(Icon));
+        of: buttonWatchlistFinder,
+        matching: find.byType(Icon),
+      );
       expect(iconWatchlistFinder, findsOneWidget);
 
       Icon iconWatchlist = tester.widget(iconWatchlistFinder);
@@ -62,7 +70,9 @@ void main() {
       await tester.pumpAndSettle();
 
       final iconWatchlistAfterFinder = find.descendant(
-          of: buttonWatchlistFinder, matching: find.byType(Icon));
+        of: buttonWatchlistFinder,
+        matching: find.byType(Icon),
+      );
       Icon iconWatchlistFinal = tester.widget(iconWatchlistAfterFinder);
       expect(iconWatchlistFinal.icon, Icons.add);
     });
@@ -84,7 +94,9 @@ void main() {
       final buttonWatchlistFinder = find.byType(ElevatedButton);
 
       final iconWatchlistFinder = find.descendant(
-          of: buttonWatchlistFinder, matching: find.byType(Icon));
+        of: buttonWatchlistFinder,
+        matching: find.byType(Icon),
+      );
       expect(iconWatchlistFinder, findsOneWidget);
 
       Icon iconWatchlist = tester.widget(iconWatchlistFinder);
@@ -121,7 +133,9 @@ void main() {
       await tester.pumpAndSettle();
 
       final iconWatchlistAfterFinder = find.descendant(
-          of: buttonWatchlistFinder, matching: find.byType(Icon));
+        of: buttonWatchlistFinder,
+        matching: find.byType(Icon),
+      );
       Icon iconWatchlistFinal = tester.widget(iconWatchlistAfterFinder);
       expect(iconWatchlistFinal.icon, Icons.add);
     });

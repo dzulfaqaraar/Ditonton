@@ -15,8 +15,9 @@ void main() {
   group('fromJson', () {
     test('should return a valid model from JSON', () async {
       // arrange
-      final Map<String, dynamic> jsonMap =
-          json.decode(readJson('dummy_data/tv_series_detail.json'));
+      final Map<String, dynamic> jsonMap = json.decode(
+        readJson('dummy_data/tv_series_detail.json'),
+      );
       // act
       final result = TvSeriesDetailResponse.fromJson(jsonMap);
       // assert
@@ -35,7 +36,7 @@ void main() {
         "overview": "Night Court is an American television",
         "poster_path": "/nazkESnCZVpCjZ3WPs265DFjW0V.jpg",
         "genres": [
-          {"id": 35, "name": "Comedy"}
+          {"id": 35, "name": "Comedy"},
         ],
         "vote_average": 7.4,
         "episode_run_time": [24],
@@ -47,7 +48,7 @@ void main() {
             "name": "Specials",
             "overview": "",
             "poster_path": '/3T19XSr6yqaLNK8uJWFImPgRax0.png',
-            "season_number": 0
+            "season_number": 0,
           },
           {
             "air_date": null,
@@ -56,9 +57,9 @@ void main() {
             "name": "Specials",
             "overview": "",
             "poster_path": '/3T19XSr6yqaLNK8uJWFImPgRax0.png',
-            "season_number": 0
-          }
-        ]
+            "season_number": 0,
+          },
+        ],
       };
       expect(result, expectedJsonMap);
     });

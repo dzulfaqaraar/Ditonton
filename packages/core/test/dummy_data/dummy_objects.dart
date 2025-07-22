@@ -131,7 +131,7 @@ const testWatchlistTableTvSeries = WatchlistTable(
 );
 final testListOfWatchlistTable = [
   testWatchlistTableMovies,
-  testWatchlistTableTvSeries
+  testWatchlistTableTvSeries,
 ];
 
 const testWatchlistMovies = Watchlist(
@@ -196,7 +196,7 @@ const testTvSeriesDetailResponse = TvSeriesDetailResponse(
       posterPath: '/3T19XSr6yqaLNK8uJWFImPgRax0.png',
       episodeCount: 2,
       seasonNumber: 0,
-    )
+    ),
   ],
 );
 
@@ -226,7 +226,7 @@ const testTvSeriesDetail = TvSeriesDetail(
       posterPath: '/3T19XSr6yqaLNK8uJWFImPgRax0.png',
       episodeCount: 2,
       seasonNumber: 0,
-    )
+    ),
   ],
 );
 
@@ -264,7 +264,7 @@ const testTvSeriesEpisodeResponse = TvSeriesEpisodeResponse(
           name: 'Irene Keng',
           character: 'Elle McLean',
           profilePath: '/xElpxbxNFNtBdeccxSqbnAeaul2.jpg',
-        )
+        ),
       ],
     ),
     EpisodeResponse(
@@ -280,9 +280,9 @@ const testTvSeriesEpisodeResponse = TvSeriesEpisodeResponse(
           name: 'Irene Keng',
           character: 'Elle McLean',
           profilePath: '/xElpxbxNFNtBdeccxSqbnAeaul2.jpg',
-        )
+        ),
       ],
-    )
+    ),
   ],
   seasonNumber: 1,
 );
@@ -307,7 +307,7 @@ const testTvSeriesEpisode = TvSeriesEpisode(
           name: 'Irene Keng',
           character: 'Elle McLean',
           profilePath: '/xElpxbxNFNtBdeccxSqbnAeaul2.jpg',
-        )
+        ),
       ],
     ),
     Episode(
@@ -323,9 +323,9 @@ const testTvSeriesEpisode = TvSeriesEpisode(
           name: 'Irene Keng',
           character: 'Elle McLean',
           profilePath: '/xElpxbxNFNtBdeccxSqbnAeaul2.jpg',
-        )
+        ),
       ],
-    )
+    ),
   ],
   seasonNumber: 1,
 );

@@ -1,28 +1,25 @@
-import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/domain/usecase/get_tvseries.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:tv_series/tv_series.dart';
 
 part 'airing_today_tv_series_event.dart';
-part 'airing_today_tv_series_state.dart';
 
 class AiringTodayTvSeriesBloc
-    extends Bloc<AiringTodayTvSeriesEvent, AiringTodayTvSeriesState> {
-  final GetAiringTodayTvSeries getAiringTodayTvSeries;
+    extends Bloc<AiringTodayTvSeriesEvent, BlocState> {
+  final GetTvSeries getTvSeries;
 
-  AiringTodayTvSeriesBloc(this.getAiringTodayTvSeries)
-      : super(AiringTodayTvSeriesEmpty()) {
+  AiringTodayTvSeriesBloc(this.getTvSeries) : super(BlocEmpty()) {
     on<OnFetchingAiringToday>((event, emit) async {
-      emit(AiringTodayTvSeriesLoading());
+      emit(BlocLoading());
 
-      final result = await getAiringTodayTvSeries.execute();
+      final result = await getTvSeries.execute('/tv/airing_today');
 
       result.fold(
         (failure) {
-          emit(AiringTodayTvSeriesError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(AiringTodayTvSeriesHasData(data));
+          emit(BlocHasData(data));
         },
       );
     });

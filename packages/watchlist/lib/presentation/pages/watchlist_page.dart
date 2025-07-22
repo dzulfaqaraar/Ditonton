@@ -1,10 +1,11 @@
 import 'package:core/core.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:watchlist/presentation/bloc/watchlist_bloc.dart';
 
 class WatchlistPage extends StatefulWidget {
-  const WatchlistPage({Key? key}) : super(key: key);
+  const WatchlistPage({super.key});
 
   @override
   State<WatchlistPage> createState() => _WatchlistPageState();
@@ -14,8 +15,11 @@ class _WatchlistPageState extends State<WatchlistPage> with RouteAware {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-        () => context.read<WatchlistBloc>().add(const OnFetchingData()));
+    Future.microtask(() {
+      if (mounted) {
+        context.read<WatchlistBloc>().add(const OnFetchingData());
+      }
+    });
   }
 
   @override
@@ -32,27 +36,18 @@ class _WatchlistPageState extends State<WatchlistPage> with RouteAware {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Watchlist'),
-      ),
+      appBar: AppBar(title: const Text('Watchlist')),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: BlocBuilder<WatchlistBloc, WatchlistState>(
+        child: BlocBuilder<WatchlistBloc, BlocState>(
           builder: (context, state) {
-            if (state is WatchlistLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (state is WatchlistHasData) {
+            if (state is BlocLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is BlocHasData<List<Watchlist>>) {
               final result = state.result;
 
               if (result.isEmpty) {
-                return Center(
-                  child: Text(
-                    'No data',
-                    style: titleMedium,
-                  ),
-                );
+                return Center(child: Text('No data', style: titleLarge));
               } else {
                 return ListView.builder(
                   itemBuilder: (context, index) {
@@ -79,7 +74,7 @@ class _WatchlistPageState extends State<WatchlistPage> with RouteAware {
                   itemCount: result.length,
                 );
               }
-            } else if (state is WatchlistError) {
+            } else if (state is BlocError) {
               return Center(
                 key: const Key('error_message'),
                 child: Text(state.message),

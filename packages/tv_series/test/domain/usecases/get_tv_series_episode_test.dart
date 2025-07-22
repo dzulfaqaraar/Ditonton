@@ -18,8 +18,9 @@ void main() {
   group('GetTvSeriesEpisode Tests', () {
     test('should get data for tv series episode from the repository', () async {
       // arrange
-      when(mockMovieRepository.getTvSeriesEpisode(testTvSeriesId, 1))
-          .thenAnswer((_) async => const Right(testTvSeriesEpisode));
+      when(
+        mockMovieRepository.getTvSeriesEpisode(testTvSeriesId, 1),
+      ).thenAnswer((_) async => const Right(testTvSeriesEpisode));
       // act
       final result = await usecase.execute(testTvSeriesId, 1);
       // assert

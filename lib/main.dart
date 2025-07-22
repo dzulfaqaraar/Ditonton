@@ -1,22 +1,27 @@
 import 'package:about/about.dart';
 import 'package:core/core.dart';
-import 'package:ditonton/home_page.dart';
-import 'package:firebase_core/firebase_core.dart';
+import 'package:core/environment/environment.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:movies/movies.dart';
 import 'package:provider/provider.dart';
 import 'package:search/search.dart';
 import 'package:tv_series/tv_series.dart';
 import 'package:watchlist/watchlist.dart';
 
+import 'home_page.dart';
 import 'injection.dart' as di;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  Environment.flavorName = const String.fromEnvironment(
+    "env",
+    defaultValue: "develop",
+  );
+  await dotenv.load(fileName: Environment.fileName);
 
   final sslCert = await rootBundle.load('certificates/certificates.pem');
   di.init(sslCert);
@@ -25,63 +30,40 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        BlocProvider(
-          create: (_) => di.locator<SearchBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<WatchlistBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<MovieDetailBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<MovieRecommendationBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<MovieWatchlistBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<PopularMoviesBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<TopRatedMoviesBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<MovieListBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<AiringTodayTvSeriesBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<PopularTvSeriesBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<TopRatedTvSeriesBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<TvSeriesDetailBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<TvSeriesRecommendationBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<TvSeriesWatchlistBloc>(),
-        ),
-        BlocProvider(
-          create: (_) => di.locator<TvSeriesEpisodeBloc>(),
-        ),
+        BlocProvider(create: (_) => di.locator<SearchBloc>()),
+        BlocProvider(create: (_) => di.locator<WatchlistBloc>()),
+        BlocProvider(create: (_) => di.locator<MovieDetailBloc>()),
+        BlocProvider(create: (_) => di.locator<MovieRecommendationBloc>()),
+        BlocProvider(create: (_) => di.locator<MovieWatchlistBloc>()),
+        BlocProvider(create: (_) => di.locator<PopularMoviesBloc>()),
+        BlocProvider(create: (_) => di.locator<TopRatedMoviesBloc>()),
+        BlocProvider(create: (_) => di.locator<MovieListBloc>()),
+        BlocProvider(create: (_) => di.locator<AiringTodayTvSeriesBloc>()),
+        BlocProvider(create: (_) => di.locator<PopularTvSeriesBloc>()),
+        BlocProvider(create: (_) => di.locator<TopRatedTvSeriesBloc>()),
+        BlocProvider(create: (_) => di.locator<TvSeriesDetailBloc>()),
+        BlocProvider(create: (_) => di.locator<TvSeriesRecommendationBloc>()),
+        BlocProvider(create: (_) => di.locator<TvSeriesWatchlistBloc>()),
+        BlocProvider(create: (_) => di.locator<TvSeriesEpisodeBloc>()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'Ditonton',
         theme: ThemeData.dark().copyWith(
           colorScheme: kColorScheme,
           primaryColor: kRichBlack,
           scaffoldBackgroundColor: kRichBlack,
-          textTheme: kTextTheme,
+          textTheme: TextTheme(
+            headlineSmall: headlineSmall,
+            titleLarge: titleLarge,
+            titleMedium: titleMedium,
+            bodyMedium: bodyMedium,
+          ),
         ),
         home: HomePage(),
         navigatorObservers: [routeObserver],
@@ -101,7 +83,8 @@ class MyApp extends StatelessWidget {
               );
             case airingTodayTvSeriesRoute:
               return CupertinoPageRoute(
-                  builder: (_) => AiringTodayTvSeriesPage());
+                builder: (_) => AiringTodayTvSeriesPage(),
+              );
             case popularTvSeriesRoute:
               return CupertinoPageRoute(builder: (_) => PopularTvSeriesPage());
             case topRatedTvSeriesRoute:
@@ -129,13 +112,13 @@ class MyApp extends StatelessWidget {
             case watchlistRoute:
               return MaterialPageRoute(builder: (_) => WatchlistPage());
             default:
-              return MaterialPageRoute(builder: (_) {
-                return Scaffold(
-                  body: Center(
-                    child: Text('Page not found :('),
-                  ),
-                );
-              });
+              return MaterialPageRoute(
+                builder: (_) {
+                  return Scaffold(
+                    body: Center(child: Text('Page not found :(')),
+                  );
+                },
+              );
           }
         },
       ),

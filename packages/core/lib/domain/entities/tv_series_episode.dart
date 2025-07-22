@@ -21,15 +21,7 @@ class TvSeriesEpisode extends Equatable {
 
   @override
   List<Object?> get props {
-    return [
-      id,
-      name,
-      overview,
-      posterPath,
-      airDate,
-      episodes,
-      seasonNumber,
-    ];
+    return [id, name, overview, posterPath, airDate, episodes, seasonNumber];
   }
 }
 
@@ -52,14 +44,7 @@ class Episode extends Equatable {
 
   @override
   List<Object?> get props {
-    return [
-      id,
-      name,
-      overview,
-      episodeNumber,
-      stillPath,
-      guestStars,
-    ];
+    return [id, name, overview, episodeNumber, stillPath, guestStars];
   }
 }
 
@@ -77,10 +62,5 @@ class Crew extends Equatable {
   final String? profilePath;
 
   @override
-  List<Object?> get props => [
-        id,
-        character,
-        name,
-        profilePath,
-      ];
+  List<Object?> get props => [id, character, name, profilePath];
 }

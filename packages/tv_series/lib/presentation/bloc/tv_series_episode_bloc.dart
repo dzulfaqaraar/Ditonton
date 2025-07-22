@@ -1,27 +1,25 @@
 import 'package:core/core.dart';
-import 'package:equatable/equatable.dart';
+import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tv_series/domain/usecases/get_tv_series_episode.dart';
 
 part 'tv_series_episode_event.dart';
-part 'tv_series_episode_state.dart';
 
-class TvSeriesEpisodeBloc
-    extends Bloc<TvSeriesEpisodeEvent, TvSeriesEpisodeState> {
+class TvSeriesEpisodeBloc extends Bloc<TvSeriesEpisodeEvent, BlocState> {
   final GetTvSeriesEpisode getTvSeriesEpisode;
 
-  TvSeriesEpisodeBloc(this.getTvSeriesEpisode) : super(TvSeriesEpisodeEmpty()) {
+  TvSeriesEpisodeBloc(this.getTvSeriesEpisode) : super(BlocEmpty()) {
     on<OnFetchingEpisode>((event, emit) async {
-      emit(TvSeriesEpisodeLoading());
+      emit(BlocLoading());
 
       final result = await getTvSeriesEpisode.execute(event.id, event.season);
 
       result.fold(
         (failure) {
-          emit(TvSeriesEpisodeError(failure.message));
+          emit(BlocError(failure.message));
         },
         (data) {
-          emit(TvSeriesEpisodeHasData(data));
+          emit(BlocHasData<TvSeriesEpisode?>(data));
         },
       );
     });
