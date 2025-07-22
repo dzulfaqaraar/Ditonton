@@ -2,13 +2,13 @@ workflows:
   flutter-test:
     name: Flutter Test & Analysis
     max_build_duration: 30
-    instance_type: linux_x2
+    instance_type: mac_mini_m2
     triggering:
       events:
         - push
         - pull_request
       branch_patterns:
-        - pattern: develop
+        - pattern: master
           include: true
     environment:
       groups:
@@ -52,28 +52,22 @@ workflows:
           echo "Checking Dart format..."
           dart format --set-exit-if-changed .
       
+      - name: Install lcov
+        script: |
+          brew install lcov
+
       - name: Run unit tests with coverage
         script: |
           echo "Running unit tests..."
           chmod +x ./test.sh
           ./test.sh
       
-      - name: Upload coverage to Codecov
-        script: |
-          if [ -f "coverage/lcov.info" ]; then
-            echo "Uploading coverage to Codecov..."
-            curl -Os https://uploader.codecov.io/latest/linux/codecov
-            chmod +x codecov
-            ./codecov -t $CODECOV_TOKEN -f coverage/lcov.info
-          else
-            echo "No coverage file found"
-          fi
     artifacts:
       - coverage/**
     publishing:
       email:
         recipients:
-          - your-email@example.com # Replace with your email
+          - dzulfaqar.aar@gmail.com
         notify:
           success: false
           failure: true
@@ -81,13 +75,13 @@ workflows:
   android-build:
     name: Android Build
     max_build_duration: 60
-    instance_type: linux_x2
+    instance_type: mac_mini_m2
     triggering:
       events:
         - push
         - pull_request
       branch_patterns:
-        - pattern: develop
+        - pattern: master
           include: true
     environment:
       groups:
@@ -121,6 +115,18 @@ workflows:
           echo "Creating certificates.pem..."
           mkdir -p ./certificates
           echo "$CERT_PEM" > ./certificates/certificates.pem
+          
+      - name: Get dependencies
+        script: |
+          echo "Getting Flutter dependencies..."
+          flutter pub get
+          cd packages/core && flutter pub get && flutter pub run build_runner build
+          cd ../movies && flutter pub get && flutter pub run build_runner build
+          cd ../tv_series && flutter pub get && flutter pub run build_runner build
+          cd ../search && flutter pub get && flutter pub run build_runner build
+          cd ../watchlist && flutter pub get && flutter pub run build_runner build
+          cd ../about && flutter pub get
+          cd ../..
       
       - name: Build Android APK
         script: |
@@ -132,21 +138,21 @@ workflows:
     publishing:
       email:
         recipients:
-          - your-email@example.com # Replace with your email
+          - dzulfaqar.aar@gmail.com
         notify:
           success: true
-          failure: true
+          failure: false
 
   ios-build:
     name: iOS Build
     max_build_duration: 60
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     triggering:
       events:
         - push
         - pull_request
       branch_patterns:
-        - pattern: develop
+        - pattern: master
           include: true
     environment:
       groups:
@@ -154,12 +160,7 @@ workflows:
       flutter: 3.32.7
       xcode: latest
       cocoapods: default
-    scripts:
-      - name: Get dependencies
-        script: |
-          echo "Getting Flutter dependencies..."
-          flutter pub get
-      
+    scripts:      
       - name: Create environment files
         script: |
           echo "Creating .env file..."
@@ -171,6 +172,18 @@ workflows:
           echo "Creating certificates.pem..."
           mkdir -p ./certificates
           echo "$CERT_PEM" > ./certificates/certificates.pem
+
+      - name: Get dependencies
+        script: |
+          echo "Getting Flutter dependencies..."
+          flutter pub get
+          cd packages/core && flutter pub get && flutter pub run build_runner build
+          cd ../movies && flutter pub get && flutter pub run build_runner build
+          cd ../tv_series && flutter pub get && flutter pub run build_runner build
+          cd ../search && flutter pub get && flutter pub run build_runner build
+          cd ../watchlist && flutter pub get && flutter pub run build_runner build
+          cd ../about && flutter pub get
+          cd ../..
       
       - name: Build iOS (no codesign)
         script: |
@@ -181,7 +194,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - your-email@example.com # Replace with your email
+          - dzulfaqar.aar@gmail.com
         notify:
           success: true
-          failure: true
+          failure: false

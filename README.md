@@ -1,7 +1,7 @@
 # DITONTON
 
 [![Flutter CI/CD](https://github.com/dzulfaqaraar/Ditonton/actions/workflows/ci.yml/badge.svg)](https://github.com/dzulfaqaraar/Ditonton/actions/workflows/ci.yml)
-[![Codemagic build status](https://api.codemagic.io/apps/687fd23d97393fa71f43b9af/687fd23d97393fa71f43b9ae/status_badge.svg)](https://codemagic.io/app/687fd23d97393fa71f43b9af/687fd23d97393fa71f43b9ae/latest_build)
+<!-- [![Codemagic build status](https://api.codemagic.io/apps/687fde465b46c75b4ba54603/687fde465b46c75b4ba54602/status_badge.svg)](https://codemagic.io/app/687fde465b46c75b4ba54603/687fde465b46c75b4ba54602/latest_build) -->
 
 Submission Project for Dicoding Course
 
