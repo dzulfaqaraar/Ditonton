@@ -3,7 +3,9 @@
 [![Flutter CI/CD](https://github.com/dzulfaqaraar/Ditonton/actions/workflows/ci.yml/badge.svg)](https://github.com/dzulfaqaraar/Ditonton/actions/workflows/ci.yml)
 <!-- [![Codemagic build status](https://api.codemagic.io/apps/687fde465b46c75b4ba54603/687fde465b46c75b4ba54602/status_badge.svg)](https://codemagic.io/app/687fde465b46c75b4ba54603/687fde465b46c75b4ba54602/latest_build) -->
 
-Submission Project for Dicoding Course
+## Submission Project for Dicoding Course
+
+**This repository documents my approach to completing the submission, including how I maintain the project with up-to-date implementations. It also features a variety of test scenarios and thorough reporting to ensure code quality and reliability.**
 
 ## Project Overview
 
