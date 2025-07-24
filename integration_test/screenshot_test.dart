@@ -78,6 +78,7 @@ void main() {
       final searchField = find.byType(TextField);
       if (searchField.evaluate().isNotEmpty) {
         await tester.enterText(searchField, 'Harry');
+        await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pumpAndSettle();
         await tester.pump(const Duration(seconds: 2));
       }
@@ -191,11 +192,65 @@ void main() {
       final searchField = find.byType(TextField);
       if (searchField.evaluate().isNotEmpty) {
         await tester.enterText(searchField, 'One Piece');
+        await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pumpAndSettle();
         await tester.pump(const Duration(seconds: 2));
       }
 
       await takeScreenshot('11.tv_series_search_page');
+    });
+
+    testWidgets('TV Series season screenshot', (WidgetTester tester) async {
+      app.main();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('drawer_icon')));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(Key('menu_tv_series')));
+      await tester.pumpAndSettle();
+
+      final searchIcon = find.byIcon(Icons.search);
+      await tester.tap(searchIcon);
+      await tester.pumpAndSettle();
+
+      final searchField = find.byType(TextField);
+      if (searchField.evaluate().isNotEmpty) {
+        await tester.enterText(searchField, 'One Piece');
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 2));
+      }
+
+      final tvSeriesCard = find.byKey(Key('tv_series_card_item')).first;
+      await tester.tap(tvSeriesCard);
+      await tester.pumpAndSettle();
+
+      final seasonButton = find.byKey(Key('season_button_toggle'));
+      if (seasonButton.evaluate().isNotEmpty) {
+        await tester.tap(seasonButton);
+        await tester.pumpAndSettle();
+      }
+
+      // Scroll to bottom more before taking screenshot
+      final customScrollView = find.byType(CustomScrollView);
+      if (customScrollView.evaluate().isNotEmpty) {
+        await tester.drag(customScrollView, const Offset(0, -600));
+        await tester.pump();
+      }
+
+      // Check if season has View All button and click it
+      final viewAllButton = find.text('View All');
+      if (viewAllButton.evaluate().isNotEmpty) {
+        await tester.tap(viewAllButton);
+        await tester.pumpAndSettle();
+
+        // Additional scroll to bottom
+        await tester.drag(customScrollView, const Offset(0, -300));
+        await tester.pumpAndSettle();
+      }
+
+      await takeScreenshot('12.tv_series_season');
     });
 
     testWidgets('TV Series episode screenshot', (WidgetTester tester) async {
@@ -215,6 +270,7 @@ void main() {
       final searchField = find.byType(TextField);
       if (searchField.evaluate().isNotEmpty) {
         await tester.enterText(searchField, 'One Piece');
+        await tester.testTextInput.receiveAction(TextInputAction.done);
         await tester.pumpAndSettle();
         await tester.pump(const Duration(seconds: 2));
       }
@@ -241,7 +297,7 @@ void main() {
         await tester.pumpAndSettle();
       }
 
-      await takeScreenshot('12.tv_series_episode');
+      await takeScreenshot('13.tv_series_episode');
     });
 
     testWidgets('Watchlist page screenshot', (WidgetTester tester) async {
@@ -301,7 +357,7 @@ void main() {
       await tester.tap(find.byKey(Key('menu_watchlist')));
       await tester.pumpAndSettle();
 
-      await takeScreenshot('13.watchlist_page');
+      await takeScreenshot('14.watchlist_page');
     });
 
     testWidgets('About page screenshot', (WidgetTester tester) async {
@@ -315,7 +371,7 @@ void main() {
       await tester.tap(aboutTile);
       await tester.pumpAndSettle();
 
-      await takeScreenshot('14.about_page');
+      await takeScreenshot('15.about_page');
     });
   });
 }

@@ -49,6 +49,32 @@ void main() {
       expect(image.errorWidget, isNotNull);
     });
 
+    testWidgets('Page should display error icon when image fails to load', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        makeTestableWidget(const MovieCard(movie: movieWithInvalidImage)),
+      );
+
+      final imageFinder = find.byType(CachedNetworkImage);
+      expect(imageFinder, findsOneWidget);
+
+      CachedNetworkImage image = tester.widget(imageFinder);
+      expect(image.errorWidget, isNotNull);
+
+      // Test that errorWidget returns an Icon widget with error icon
+      final context = tester.element(imageFinder);
+      final errorWidget = image.errorWidget!(
+        context,
+        'invalid_url',
+        Exception('Image load failed'),
+      );
+
+      expect(errorWidget, isA<Icon>());
+      final icon = errorWidget as Icon;
+      expect(icon.icon, Icons.error);
+    });
+
     testWidgets('Button should open detail page', (WidgetTester tester) async {
       await tester.pumpWidget(
         makeTestableWidget(const MovieCard(movie: testMovie)),

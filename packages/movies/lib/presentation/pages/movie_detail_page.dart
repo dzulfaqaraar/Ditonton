@@ -88,14 +88,14 @@ class DetailContent extends StatelessWidget {
     return Stack(
       children: [
         CachedNetworkImage(
-          imageUrl: 'https://image.tmdb.org/t/p/w500${movie.posterPath}',
+          imageUrl: '$baseImageUrl${movie.posterPath}',
           width: screenWidth,
           placeholder: (context, url) =>
               const Center(child: CircularProgressIndicator()),
           errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
         Container(
-          margin: const EdgeInsets.only(top: 48 + 8),
+          margin: const EdgeInsets.only(top: 56),
           child: DraggableScrollableSheet(
             builder: (context, scrollController) {
               return Container(
@@ -103,53 +103,9 @@ class DetailContent extends StatelessWidget {
                   color: kRichBlack,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                 ),
-                padding: const EdgeInsets.only(left: 16, top: 16, right: 16),
-                child: Stack(
-                  children: [
-                    Container(
-                      margin: const EdgeInsets.only(top: 16),
-                      child: SingleChildScrollView(
-                        controller: scrollController,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(movie.title, style: headlineSmall),
-                            _watchlistView(),
-                            Text(_showGenres(movie.genres)),
-                            Text(_showDuration(movie.runtime)),
-                            Row(
-                              children: [
-                                RatingBarIndicator(
-                                  rating: movie.voteAverage / 2,
-                                  itemCount: 5,
-                                  itemBuilder: (context, index) => const Icon(
-                                    Icons.star,
-                                    color: kMikadoYellow,
-                                  ),
-                                  itemSize: 24,
-                                ),
-                                Text('${movie.voteAverage}'),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Text('Overview', style: titleLarge),
-                            Text(movie.overview),
-                            const SizedBox(height: 16),
-                            Text('Recommendations', style: titleLarge),
-                            _recommendationView(),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child: Container(
-                        color: Colors.white,
-                        height: 4,
-                        width: 48,
-                      ),
-                    ),
-                  ],
+                child: CustomScrollView(
+                  controller: scrollController,
+                  slivers: [_detailView(), _recommendationView()],
                 ),
               );
             },
@@ -173,6 +129,46 @@ class DetailContent extends StatelessWidget {
     );
   }
 
+  Widget _detailView() {
+    return SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                margin: EdgeInsets.only(bottom: 16),
+                color: Colors.white,
+                height: 4,
+                width: 48,
+              ),
+            ),
+            Text(movie.title, style: headlineSmall),
+            _watchlistView(),
+            Text(_showGenres(movie.genres)),
+            Text(_showDuration(movie.runtime)),
+            Row(
+              children: [
+                RatingBarIndicator(
+                  rating: movie.voteAverage / 2,
+                  itemCount: 5,
+                  itemBuilder: (context, index) =>
+                      const Icon(Icons.star, color: kMikadoYellow),
+                  itemSize: 24,
+                ),
+                Text('${movie.voteAverage}'),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text('Overview', style: titleLarge),
+            Text(movie.overview),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _watchlistView() {
     return BlocBuilder<MovieWatchlistBloc, BlocState>(
       builder: (context, state) {
@@ -181,7 +177,11 @@ class DetailContent extends StatelessWidget {
             onPressed: null,
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [Icon(Icons.add), Text('Watchlist')],
+              children: const [
+                Icon(Icons.add),
+                SizedBox(width: 8),
+                Text('Watchlist'),
+              ],
             ),
           );
         } else if (state is MovieWatchlistHasMessage) {
@@ -205,6 +205,7 @@ class DetailContent extends StatelessWidget {
                 isAddedWatchlist == true
                     ? const Icon(Icons.check)
                     : const Icon(Icons.add),
+                SizedBox(width: 8),
                 const Text('Watchlist', key: Key('watchlist_text')),
               ],
             ),
@@ -217,55 +218,78 @@ class DetailContent extends StatelessWidget {
   }
 
   Widget _recommendationView() {
-    return BlocBuilder<MovieRecommendationBloc, BlocState>(
-      builder: (context, state) {
-        if (state is BlocLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is BlocHasData<List<Movie>>) {
-          final recommendations = state.result;
-          return SizedBox(
-            height: 150,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemBuilder: (context, index) {
-                final movie = recommendations[index];
-                return Padding(
-                  padding: const EdgeInsets.all(4.0),
-                  child: InkWell(
-                    key: const Key('item_recommendation'),
-                    onTap: () {
-                      Navigator.pushReplacementNamed(
-                        context,
-                        detailMovieRoute,
-                        arguments: movie.id,
+    return SliverToBoxAdapter(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text('Recommendations', style: titleLarge),
+          ),
+          BlocBuilder<MovieRecommendationBloc, BlocState>(
+            builder: (context, state) {
+              if (state is BlocLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is BlocHasData<List<Movie>>) {
+                final recommendations = state.result;
+                return SizedBox(
+                  height: 150,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.only(left: 16),
+                    itemBuilder: (context, index) {
+                      final movie = recommendations[index];
+                      return Container(
+                        margin: const EdgeInsets.only(right: 16),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(16),
+                          ),
+                          child: Stack(
+                            children: [
+                              CachedNetworkImage(
+                                imageUrl: '$baseImageUrl${movie.posterPath}',
+                                placeholder: (context, url) => const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              ),
+                              Positioned.fill(
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        detailMovieRoute,
+                                        arguments: movie.id,
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     },
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      child: CachedNetworkImage(
-                        imageUrl:
-                            'https://image.tmdb.org/t/p/w500${movie.posterPath}',
-                        placeholder: (context, url) =>
-                            const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                    ),
+                    itemCount: recommendations.length,
                   ),
                 );
-              },
-              itemCount: recommendations.length,
-            ),
-          );
-        } else if (state is BlocError) {
-          return Center(
-            key: const Key('error_message'),
-            child: Text(state.message),
-          );
-        } else {
-          return const SizedBox.shrink();
-        }
-      },
+              } else if (state is BlocError) {
+                return Center(
+                  key: const Key('error_message'),
+                  child: Text(state.message),
+                );
+              } else {
+                return const SizedBox.shrink();
+              }
+            },
+          ),
+        ],
+      ),
     );
   }
 

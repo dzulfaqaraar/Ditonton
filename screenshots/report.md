@@ -50,17 +50,21 @@ Ditonton is a comprehensive movie and TV series catalog application developed by
 **Feature:** TV series search functionality  
 **Description:** Enables searching for specific TV series. The example shows search results for "One Piece" displaying various related content including different versions and spin-offs of the popular anime series.
 
-### 12. TV Series Episodes (12.tv_series_episode.png)
+### 12. TV Series Season (12.tv_series_season.png)
+**Feature:** Season listing and details  
+**Description:** Displays seasons of a TV series with season thumbnails, titles, descriptions, and View All functionality. Shows "One Piece" seasons with detailed season information and enhanced scrolling for better content visibility.
+
+### 13. TV Series Episodes (13.tv_series_episode.png)
 **Feature:** Episode listing and details  
 **Description:** Displays individual episodes of a TV series with episode thumbnails, titles, descriptions, and expand functionality. Shows "One Piece" episodes with detailed episode information and visual previews.
 
 ## Universal Features
 
-### 13. Watchlist (13.watchlist_page.png)
+### 14. Watchlist (14.watchlist_page.png)
 **Feature:** Personal watchlist management  
 **Description:** Allows users to save and manage their favorite movies and TV series in a personal collection. Shows saved items including "The Tonight Show Starring Jimmy Fallon" and "How to Train Your Dragon" with their respective details.
 
-### 14. About Page (14.about_page.png)
+### 15. About Page (15.about_page.png)
 **Feature:** Application information  
 **Description:** Provides information about the Ditonton application, explaining that it's a movie catalog app developed by Dicoding Indonesia as a sample project for the Flutter Developer Expert course. Features the company logo and mission statement.
 

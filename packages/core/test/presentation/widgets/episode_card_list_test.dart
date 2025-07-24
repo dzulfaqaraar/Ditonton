@@ -73,6 +73,71 @@ void main() {
       expect(guestStarsListFinder, findsOneWidget);
     });
 
+    testWidgets(
+      'Page should display error icon when episode image fails to load',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          makeTestableWidget(EpisodeCard(episode: episodeWithInvalidImage)),
+        );
+
+        final imageFinder = find.byType(CachedNetworkImage);
+        expect(imageFinder, findsOneWidget);
+
+        CachedNetworkImage image = tester.widget(imageFinder);
+        expect(image.errorWidget, isNotNull);
+
+        // Test that errorWidget returns an Icon widget with error icon
+        final context = tester.element(imageFinder);
+        final errorWidget = image.errorWidget!(
+          context,
+          'invalid_url',
+          Exception('Image load failed'),
+        );
+
+        expect(errorWidget, isA<Icon>());
+        final icon = errorWidget as Icon;
+        expect(icon.icon, Icons.error);
+      },
+    );
+
+    testWidgets(
+      'Page should display error icon when guest star image fails to load',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          makeTestableWidget(
+            EpisodeCard(episode: episodeWithInvalidGuestImage),
+          ),
+        );
+
+        // Expand the episode to show guest stars
+        final inkWellFinder = find.byKey(const Key('episode_card_item'));
+        await tester.tap(inkWellFinder);
+        await tester.pump();
+
+        final imageFinderList = find.byType(CachedNetworkImage);
+        expect(
+          imageFinderList,
+          findsNWidgets(2),
+        ); // Episode image + Guest star image
+
+        // Test the guest star image (second CachedNetworkImage)
+        CachedNetworkImage guestImage = tester.widget(imageFinderList.at(1));
+        expect(guestImage.errorWidget, isNotNull);
+
+        // Test that errorWidget returns an Icon widget with error icon
+        final context = tester.element(imageFinderList.at(1));
+        final errorWidget = guestImage.errorWidget!(
+          context,
+          'invalid_url',
+          Exception('Image load failed'),
+        );
+
+        expect(errorWidget, isA<Icon>());
+        final icon = errorWidget as Icon;
+        expect(icon.icon, Icons.error);
+      },
+    );
+
     testWidgets('Page should display button', (WidgetTester tester) async {
       await tester.pumpWidget(
         makeTestableWidget(

@@ -342,3 +342,73 @@ const testTvSeriesWatchlist = TvSeries(
   posterPath: '/nazkESnCZVpCjZ3WPs265DFjW0V.jpg',
   overview: 'Night Court is an American television',
 );
+
+// Additional Datasets
+
+const movieWithInvalidImage = Movie(
+  adult: false,
+  backdropPath: '/muth4OYamXf41G2evdrLEg8d3om.jpg',
+  genreIds: [14, 28],
+  id: 557,
+  originalTitle: 'Spider-Man',
+  overview: 'After being bitten by a genetically altered spider...',
+  popularity: 60.441,
+  posterPath: '/invalid_image_path.jpg',
+  releaseDate: '2002-05-01',
+  title: 'Spider-Man',
+  video: false,
+  voteAverage: 7.2,
+  voteCount: 13507,
+);
+
+const tvSeriesWithInvalidImage = TvSeries(
+  id: 135647,
+  name: '2 Good 2 Be True',
+  overview: 'Car mechanic Eloy makes a terrible first impression on Ali...',
+  posterPath: '/invalid_image_path.jpg',
+);
+
+final season = testTvSeriesDetail.seasons!.first;
+final seasonWithOverview = Season(
+  id: season.id,
+  name: season.name,
+  airDate: season.airDate,
+  overview:
+      'This is a very long overview text that should be displayed with maxLines set to 2 and overflow set to ellipsis to ensure proper text truncation behavior.',
+  posterPath: season.posterPath,
+  episodeCount: season.episodeCount,
+  seasonNumber: season.seasonNumber,
+);
+final seasonWithInvalidImage = Season(
+  id: season.id,
+  name: season.name,
+  airDate: season.airDate,
+  overview: season.overview,
+  posterPath: '/invalid_image_path.jpg',
+  episodeCount: season.episodeCount,
+  seasonNumber: season.seasonNumber,
+);
+
+final episode = testTvSeriesEpisode.episodes!.first;
+final episodeWithInvalidImage = Episode(
+  id: episode.id,
+  name: episode.name,
+  overview: episode.overview,
+  episodeNumber: episode.episodeNumber,
+  stillPath: '/invalid_image_path.jpg',
+  guestStars: episode.guestStars,
+);
+final guestStarWithInvalidImage = Crew(
+  id: episode.guestStars.first.id,
+  name: episode.guestStars.first.name,
+  character: episode.guestStars.first.character,
+  profilePath: '/invalid_image_path.jpg',
+);
+final episodeWithInvalidGuestImage = Episode(
+  id: episode.id,
+  name: episode.name,
+  overview: episode.overview,
+  episodeNumber: episode.episodeNumber,
+  stillPath: episode.stillPath,
+  guestStars: [guestStarWithInvalidImage],
+);

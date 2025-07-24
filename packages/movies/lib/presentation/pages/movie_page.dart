@@ -27,68 +27,68 @@ class _MoviePageState extends State<MoviePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Now Playing', style: titleLarge),
-            BlocBuilder<MovieListBloc, BlocState>(
-              builder: (context, state) {
-                if (state is BlocLoading) {
-                  return const Center(
-                    key: Key('progress_now_playing'),
-                    child: CircularProgressIndicator(),
-                  );
-                } else if (state is BlocHasData<List<Movie>>) {
-                  return MovieList(movies: state.result);
-                } else {
-                  return const Text('Failed');
-                }
-              },
-            ),
-            SubHeadingView(
-              title: 'Popular',
-              onTap: () => Navigator.pushNamed(context, popularMovieRoute),
-            ),
-            BlocBuilder<PopularMoviesBloc, BlocState>(
-              builder: (context, state) {
-                if (state is BlocLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is BlocHasData<List<Movie>>) {
-                  return MovieList(movies: state.result);
-                } else {
-                  return const Text('Failed');
-                }
-              },
-            ),
-            SubHeadingView(
-              title: 'Top Rated',
-              onTap: () => Navigator.pushNamed(context, topRatedMovieRoute),
-            ),
-            BlocBuilder<TopRatedMoviesBloc, BlocState>(
-              builder: (context, state) {
-                if (state is BlocLoading) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (state is BlocHasData<List<Movie>>) {
-                  return MovieList(movies: state.result);
-                } else {
-                  return const Text('Failed');
-                }
-              },
-            ),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text('Now Playing', style: titleLarge),
+          ),
+          BlocBuilder<MovieListBloc, BlocState>(
+            builder: (context, state) {
+              if (state is BlocLoading) {
+                return const Center(
+                  key: Key('progress_now_playing'),
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is BlocHasData<List<Movie>>) {
+                return MovieList(moviesList: state.result);
+              } else {
+                return const Text('Failed');
+              }
+            },
+          ),
+          SubHeadingView(
+            title: 'Popular',
+            onTap: () => Navigator.pushNamed(context, popularMovieRoute),
+          ),
+          BlocBuilder<PopularMoviesBloc, BlocState>(
+            builder: (context, state) {
+              if (state is BlocLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is BlocHasData<List<Movie>>) {
+                return MovieList(moviesList: state.result);
+              } else {
+                return const Text('Failed');
+              }
+            },
+          ),
+          SubHeadingView(
+            title: 'Top Rated',
+            onTap: () => Navigator.pushNamed(context, topRatedMovieRoute),
+          ),
+          BlocBuilder<TopRatedMoviesBloc, BlocState>(
+            builder: (context, state) {
+              if (state is BlocLoading) {
+                return const Center(child: CircularProgressIndicator());
+              } else if (state is BlocHasData<List<Movie>>) {
+                return MovieList(moviesList: state.result);
+              } else {
+                return const Text('Failed');
+              }
+            },
+          ),
+        ],
       ),
     );
   }
 }
 
 class MovieList extends StatelessWidget {
-  final List<Movie> movies;
+  final List<Movie> moviesList;
 
-  const MovieList({super.key, required this.movies});
+  const MovieList({super.key, required this.moviesList});
 
   @override
   Widget build(BuildContext context) {
@@ -96,32 +96,44 @@ class MovieList extends StatelessWidget {
       height: 200,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(left: 16),
         itemBuilder: (context, index) {
-          final movie = movies[index];
+          final movie = moviesList[index];
           return Container(
-            padding: const EdgeInsets.all(8),
-            child: InkWell(
-              key: const Key('card_item_key'),
-              onTap: () {
-                Navigator.pushNamed(
-                  context,
-                  detailMovieRoute,
-                  arguments: movie.id,
-                );
-              },
-              child: ClipRRect(
-                borderRadius: const BorderRadius.all(Radius.circular(16)),
-                child: CachedNetworkImage(
-                  imageUrl: '$baseImageUrl${movie.posterPath}',
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
-                ),
+            margin: const EdgeInsets.only(right: 16),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(16)),
+              child: Stack(
+                children: [
+                  CachedNetworkImage(
+                    imageUrl: '$baseImageUrl${movie.posterPath}',
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error),
+                  ),
+                  Positioned.fill(
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        key: const Key('card_item_key'),
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            detailMovieRoute,
+                            arguments: movie.id,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           );
         },
-        itemCount: movies.length,
+        itemCount: moviesList.length,
       ),
     );
   }

@@ -50,7 +50,7 @@ void main() {
       );
 
       final imageClipFinder = find.byType(ClipRRect);
-      expect(imageClipFinder, findsOneWidget);
+      expect(imageClipFinder, findsWidgets);
 
       final imageFinder = find.byType(CachedNetworkImage);
       expect(imageFinder, findsOneWidget);
@@ -77,14 +77,17 @@ void main() {
       Text textName = tester.widget(textNameFinder);
       expect(textName.style, titleLarge);
 
-      final textAirDateFinder = textFinder.at(1);
-      expect(textAirDateFinder, findsOneWidget);
+      final textEpisodeFinder = textFinder.at(1);
+      expect(textEpisodeFinder, findsOneWidget);
 
-      Text textAirDate = tester.widget(textAirDateFinder);
-      expect(textAirDate.style, bodyMedium);
+      Text textEpisode = tester.widget(textEpisodeFinder);
+      expect(textEpisode.style, bodyMedium);
 
       final dividerFinder = find.byType(VerticalDivider);
       expect(dividerFinder, findsNothing);
+
+      // Air date and overview are not shown for test data
+      expect(textFinder, findsNWidgets(2));
     });
 
     testWidgets('Page should display air date and divider', (
@@ -108,6 +111,63 @@ void main() {
 
       final dividerFinder = find.byType(VerticalDivider);
       expect(dividerFinder, findsOneWidget);
+    });
+
+    testWidgets(
+      'Page should display overview with SizedBox and Text overflow',
+      (WidgetTester tester) async {
+        await tester.pumpWidget(
+          makeTestableWidget(
+            SeasonCard(
+              tvSeries: testTvSeriesDetail,
+              season: seasonWithOverview,
+            ),
+          ),
+        );
+
+        final sizedBoxFinder = find.byType(SizedBox);
+        expect(sizedBoxFinder, findsWidgets);
+
+        final textFinder = find.byType(Text);
+        final overviewTextFinder = textFinder.at(2);
+        expect(overviewTextFinder, findsOneWidget);
+
+        Text overviewText = tester.widget(overviewTextFinder);
+        expect(overviewText.maxLines, 2);
+        expect(overviewText.overflow, TextOverflow.ellipsis);
+        expect(overviewText.data, seasonWithOverview.overview);
+      },
+    );
+
+    testWidgets('Page should display error icon when image fails to load', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        makeTestableWidget(
+          SeasonCard(
+            tvSeries: testTvSeriesDetail,
+            season: seasonWithInvalidImage,
+          ),
+        ),
+      );
+
+      final imageFinder = find.byType(CachedNetworkImage);
+      expect(imageFinder, findsOneWidget);
+
+      CachedNetworkImage image = tester.widget(imageFinder);
+      expect(image.errorWidget, isNotNull);
+
+      // Test that errorWidget returns an Icon widget with error icon
+      final context = tester.element(imageFinder);
+      final errorWidget = image.errorWidget!(
+        context,
+        'invalid_url',
+        Exception('Image load failed'),
+      );
+
+      expect(errorWidget, isA<Icon>());
+      final icon = errorWidget as Icon;
+      expect(icon.icon, Icons.error);
     });
 
     testWidgets('Button should open detail page', (WidgetTester tester) async {
