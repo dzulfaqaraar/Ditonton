@@ -378,4 +378,98 @@ void main() {
     final listViewFinder = find.byType(ListView, skipOffstage: false);
     expect(listViewFinder, findsOneWidget);
   });
+
+  testWidgets('Should navigate back when back button is tapped', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseDetailHasData();
+    arrangeUsecaseRecommendationEmpty();
+
+    when(
+      mockTvSeriesWatchlistBloc.state,
+    ).thenReturn(const TvSeriesWatchlistHasMessage(false, null));
+    when(mockTvSeriesWatchlistBloc.stream).thenAnswer(
+      (_) => Stream.value(const TvSeriesWatchlistHasMessage(false, null)),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<TvSeriesDetailBloc>(
+              create: (context) => mockTvSeriesDetailBloc,
+            ),
+            BlocProvider<TvSeriesRecommendationBloc>(
+              create: (context) => mockTvSeriesRecommendationBloc,
+            ),
+            BlocProvider<TvSeriesWatchlistBloc>(
+              create: (context) => mockTvSeriesWatchlistBloc,
+            ),
+          ],
+          child: const Scaffold(body: TvSeriesDetailPage(id: 1)),
+        ),
+      ),
+    );
+
+    final backButtonFinder = find.byIcon(Icons.arrow_back);
+    expect(backButtonFinder, findsOneWidget);
+
+    await tester.tap(backButtonFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(TvSeriesDetailPage), findsNothing);
+  });
+
+  testWidgets('Season button toggle should change text and show/hide seasons', (
+    WidgetTester tester,
+  ) async {
+    when(
+      mockTvSeriesDetailBloc.state,
+    ).thenReturn(BlocHasData<TvSeriesDetail>(newTestTvSeriesDetail));
+    when(mockTvSeriesDetailBloc.stream).thenAnswer(
+      (_) => Stream.value(BlocHasData<TvSeriesDetail>(newTestTvSeriesDetail)),
+    );
+
+    when(
+      mockTvSeriesWatchlistBloc.state,
+    ).thenReturn(const TvSeriesWatchlistHasMessage(false, null));
+    when(mockTvSeriesWatchlistBloc.stream).thenAnswer(
+      (_) => Stream.value(const TvSeriesWatchlistHasMessage(false, null)),
+    );
+
+    arrangeUsecaseRecommendationEmpty();
+
+    await tester.pumpWidget(
+      makeTestableWidget(const TvSeriesDetailPage(id: 1)),
+    );
+
+    // Scroll until the season_button_toggle is visible
+    final scrollableFinder = find.byType(DraggableScrollableSheet);
+    expect(scrollableFinder, findsOneWidget);
+
+    final seasonButtonFinder = find.byKey(const Key('season_button_toggle'));
+    await tester.ensureVisible(seasonButtonFinder);
+    await tester.pump();
+    expect(seasonButtonFinder, findsOneWidget);
+
+    // Initially should show "View All" text
+    expect(find.text('View All'), findsOneWidget);
+    expect(find.text('Hide Other'), findsNothing);
+
+    // Tap the season button toggle
+    await tester.tap(seasonButtonFinder);
+    await tester.pump();
+
+    // After tapping, should show "Hide Other" text
+    expect(find.text('Hide Other'), findsOneWidget);
+    expect(find.text('View All'), findsNothing);
+
+    // Tap again to toggle back
+    await tester.tap(seasonButtonFinder);
+    await tester.pump();
+
+    // Should show "View All" text again
+    expect(find.text('View All'), findsOneWidget);
+    expect(find.text('Hide Other'), findsNothing);
+  });
 }

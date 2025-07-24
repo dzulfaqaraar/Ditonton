@@ -52,7 +52,7 @@ jobs:
     - name: Format check
       run: dart format --set-exit-if-changed .
 
-    - name: Run unit tests
+    - name: Run all tests
       run: |
         chmod +x ./test.sh
         ./test.sh

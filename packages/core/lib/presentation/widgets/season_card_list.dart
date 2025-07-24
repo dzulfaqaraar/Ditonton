@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -18,13 +17,10 @@ class SeasonCard extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: CachedNetworkImage(
+                child: CustomCachedImage(
                   key: const Key('season_image'),
                   imageUrl: '$baseImageUrl${season.posterPath}',
                   height: 150,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
               Expanded(

@@ -335,4 +335,45 @@ void main() {
 
     await tester.pumpWidget(makeTestableWidget(const MovieDetailPage(id: 1)));
   });
+
+  testWidgets('Should navigate back when back button is tapped', (
+    WidgetTester tester,
+  ) async {
+    arrangeUsecaseDetailHasData();
+    arrangeUsecaseRecommendationEmpty();
+
+    when(
+      mockMovieWatchlistBloc.state,
+    ).thenReturn(const MovieWatchlistHasMessage(false, null));
+    when(mockMovieWatchlistBloc.stream).thenAnswer(
+      (_) => Stream.value(const MovieWatchlistHasMessage(false, null)),
+    );
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: MultiBlocProvider(
+          providers: [
+            BlocProvider<MovieDetailBloc>(
+              create: (context) => mockMovieDetailBloc,
+            ),
+            BlocProvider<MovieRecommendationBloc>(
+              create: (context) => mockMovieRecommendationBloc,
+            ),
+            BlocProvider<MovieWatchlistBloc>(
+              create: (context) => mockMovieWatchlistBloc,
+            ),
+          ],
+          child: const Scaffold(body: MovieDetailPage(id: 1)),
+        ),
+      ),
+    );
+
+    final backButtonFinder = find.byIcon(Icons.arrow_back);
+    expect(backButtonFinder, findsOneWidget);
+
+    await tester.tap(backButtonFinder);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MovieDetailPage), findsNothing);
+  });
 }

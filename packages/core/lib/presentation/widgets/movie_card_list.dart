@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -55,12 +54,9 @@ class MovieCard extends StatelessWidget {
               margin: const EdgeInsets.only(left: 16, bottom: 16),
               child: ClipRRect(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
-                child: CachedNetworkImage(
+                child: CustomCachedImage(
                   imageUrl: '$baseImageUrl${movie.posterPath}',
                   width: 80,
-                  placeholder: (context, url) =>
-                      const Center(child: CircularProgressIndicator()),
-                  errorWidget: (context, url, error) => const Icon(Icons.error),
                 ),
               ),
             ),

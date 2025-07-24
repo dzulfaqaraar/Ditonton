@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 
@@ -35,12 +34,9 @@ class _EpisodeCardState extends State<EpisodeCard> {
       children: [
         ClipRRect(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          child: CachedNetworkImage(
+          child: CustomCachedImage(
             imageUrl: '$baseImageUrl${widget.episode.stillPath}',
             width: 140,
-            placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
         const SizedBox(width: 8),
@@ -104,17 +100,12 @@ class _EpisodeCardState extends State<EpisodeCard> {
                             borderRadius: const BorderRadius.all(
                               Radius.circular(8),
                             ),
-                            child: CachedNetworkImage(
+                            child: CustomCachedImage(
                               imageUrl:
                                   '$baseImageUrl${guestStars.profilePath}',
                               width: 80,
                               height: 80,
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
                             ),
                           ),
                           const SizedBox(height: 4),

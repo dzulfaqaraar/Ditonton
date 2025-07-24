@@ -109,4 +109,22 @@ void main() {
     final textFinder = find.byKey(const Key('error_message'));
     expect(textFinder, findsOneWidget);
   });
+
+  testWidgets('Should trigger OnFetchingData event when didPopNext is called', (
+    WidgetTester tester,
+  ) async {
+    when(mockWatchlistBloc.state).thenReturn(BlocHasData(testListOfWatchlist));
+    when(
+      mockWatchlistBloc.stream,
+    ).thenAnswer((_) => Stream.value(BlocHasData(testListOfWatchlist)));
+
+    await tester.pumpWidget(makeTestableWidget(const WatchlistPage()));
+
+    final watchlistPageState =
+        tester.state(find.byType(WatchlistPage)) as RouteAware;
+
+    watchlistPageState.didPopNext();
+
+    verify(mockWatchlistBloc.add(const OnFetchingData())).called(2);
+  });
 }

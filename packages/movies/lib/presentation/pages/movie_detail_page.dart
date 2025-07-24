@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
@@ -87,12 +86,9 @@ class DetailContent extends StatelessWidget {
     final screenWidth = MediaQuery.of(context).size.width;
     return Stack(
       children: [
-        CachedNetworkImage(
+        CustomCachedImage(
           imageUrl: '$baseImageUrl${movie.posterPath}',
           width: screenWidth,
-          placeholder: (context, url) =>
-              const Center(child: CircularProgressIndicator()),
-          errorWidget: (context, url, error) => const Icon(Icons.error),
         ),
         Container(
           margin: const EdgeInsets.only(top: 56),
@@ -248,13 +244,8 @@ class DetailContent extends StatelessWidget {
                           ),
                           child: Stack(
                             children: [
-                              CachedNetworkImage(
+                              CustomCachedImage(
                                 imageUrl: '$baseImageUrl${movie.posterPath}',
-                                placeholder: (context, url) => const Center(
-                                  child: CircularProgressIndicator(),
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Icon(Icons.error),
                               ),
                               Positioned.fill(
                                 child: Material(

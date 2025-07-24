@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:core/core.dart';
 import 'package:core/presentation/bloc/bloc_state.dart';
 import 'package:flutter/material.dart';
@@ -105,12 +104,8 @@ class TvSeriesList extends StatelessWidget {
               borderRadius: const BorderRadius.all(Radius.circular(16)),
               child: Stack(
                 children: [
-                  CachedNetworkImage(
+                  CustomCachedImage(
                     imageUrl: '$baseImageUrl${tvSeries.posterPath}',
-                    placeholder: (context, url) =>
-                        const Center(child: CircularProgressIndicator()),
-                    errorWidget: (context, url, error) =>
-                        const Icon(Icons.error),
                   ),
                   Positioned.fill(
                     child: Material(
