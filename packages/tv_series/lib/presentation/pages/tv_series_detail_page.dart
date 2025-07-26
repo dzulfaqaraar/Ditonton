@@ -14,19 +14,21 @@ class TvSeriesDetailPage extends StatefulWidget {
 }
 
 class _TvSeriesDetailPageState extends State<TvSeriesDetailPage> {
+  void initialLoad(int id) {
+    if (mounted) {
+      context.read<TvSeriesDetailBloc>().add(OnFetchingDetail(id));
+      context.read<TvSeriesRecommendationBloc>().add(
+        OnFetchingRecommendation(id),
+      );
+      context.read<TvSeriesWatchlistBloc>().add(OnLoadingWatchlist(id));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      if (mounted) {
-        context.read<TvSeriesDetailBloc>().add(OnFetchingDetail(widget.id));
-        context.read<TvSeriesRecommendationBloc>().add(
-          OnFetchingRecommendation(widget.id),
-        );
-        context.read<TvSeriesWatchlistBloc>().add(
-          OnLoadingWatchlist(widget.id),
-        );
-      }
+      initialLoad(widget.id);
     });
   }
 
@@ -62,7 +64,11 @@ class _TvSeriesDetailPageState extends State<TvSeriesDetailPage> {
             } else if (state is BlocHasData<TvSeriesDetail>) {
               final tvSeries = state.result;
               return SafeArea(
-                child: DetailContent(id: widget.id, tvSeries: tvSeries),
+                child: DetailContent(
+                  id: widget.id,
+                  tvSeries: tvSeries,
+                  initialLoad: initialLoad,
+                ),
               );
             } else if (state is BlocError) {
               return Center(
@@ -82,8 +88,14 @@ class _TvSeriesDetailPageState extends State<TvSeriesDetailPage> {
 class DetailContent extends StatefulWidget {
   final int id;
   final TvSeriesDetail tvSeries;
+  final Function initialLoad;
 
-  const DetailContent({super.key, required this.id, required this.tvSeries});
+  const DetailContent({
+    super.key,
+    required this.id,
+    required this.tvSeries,
+    required this.initialLoad,
+  });
 
   @override
   State<DetailContent> createState() => _DetailContentState();
@@ -157,7 +169,11 @@ class _DetailContentState extends State<DetailContent> {
                 width: 48,
               ),
             ),
-            Text(widget.tvSeries.name ?? '', style: headlineSmall),
+            Text(
+              key: Key("tv_series_title"),
+              widget.tvSeries.name ?? '',
+              style: headlineSmall,
+            ),
             _watchlistView(),
             Text(_showGenres(widget.tvSeries.genres ?? [])),
             if (widget.tvSeries.episodeRunTime?.isNotEmpty ?? false)
@@ -333,11 +349,7 @@ class _DetailContentState extends State<DetailContent> {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        detailTvSeriesRoute,
-                                        arguments: tvSeries.id,
-                                      );
+                                      widget.initialLoad(tvSeries.id);
                                     },
                                   ),
                                 ),

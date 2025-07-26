@@ -15,17 +15,19 @@ class MovieDetailPage extends StatefulWidget {
 }
 
 class _MovieDetailPageState extends State<MovieDetailPage> {
+  void initialLoad(int id) {
+    if (mounted) {
+      context.read<MovieDetailBloc>().add(OnFetchingDetail(id));
+      context.read<MovieRecommendationBloc>().add(OnFetchingRecommendation(id));
+      context.read<MovieWatchlistBloc>().add(OnLoadingWatchlist(id));
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      if (mounted) {
-        context.read<MovieDetailBloc>().add(OnFetchingDetail(widget.id));
-        context.read<MovieRecommendationBloc>().add(
-          OnFetchingRecommendation(widget.id),
-        );
-        context.read<MovieWatchlistBloc>().add(OnLoadingWatchlist(widget.id));
-      }
+      initialLoad(widget.id);
     });
   }
 
@@ -60,7 +62,9 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
               return const Center(child: CircularProgressIndicator());
             } else if (state is BlocHasData<MovieDetail>) {
               final movie = state.result;
-              return SafeArea(child: DetailContent(movie: movie));
+              return SafeArea(
+                child: DetailContent(movie: movie, initialLoad: initialLoad),
+              );
             } else if (state is BlocError) {
               return Center(
                 key: const Key('error_message'),
@@ -78,8 +82,13 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
 
 class DetailContent extends StatelessWidget {
   final MovieDetail movie;
+  final Function initialLoad;
 
-  const DetailContent({super.key, required this.movie});
+  const DetailContent({
+    super.key,
+    required this.movie,
+    required this.initialLoad,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +149,7 @@ class DetailContent extends StatelessWidget {
                 width: 48,
               ),
             ),
-            Text(movie.title, style: headlineSmall),
+            Text(key: Key("movie_title"), movie.title, style: headlineSmall),
             _watchlistView(),
             Text(_showGenres(movie.genres)),
             Text(_showDuration(movie.runtime)),
@@ -252,11 +261,7 @@ class DetailContent extends StatelessWidget {
                                   color: Colors.transparent,
                                   child: InkWell(
                                     onTap: () {
-                                      Navigator.pushNamed(
-                                        context,
-                                        detailMovieRoute,
-                                        arguments: movie.id,
-                                      );
+                                      initialLoad(movie.id);
                                     },
                                   ),
                                 ),
